@@ -4,12 +4,16 @@ from django.db import models
 class Post(models.Model):
     title = models.CharField(verbose_name='Заголовок', max_length=255)
     content = models.TextField(verbose_name='Контент')
-    image = models.ImageField(verbose_name='Малюнок', upload_to='post_images/')
+    image = models.ImageField(verbose_name='Малюнок', upload_to='post_images/',default="linux",blank=True)
     is_published = models.BooleanField(verbose_name='Опубліковано', default=False)
     likes = models.IntegerField(verbose_name='Вподобайки', default=0)
     views = models.IntegerField(verbose_name='Перегляди', default=0)
     created_at = models.DateTimeField(verbose_name='Дата створення', auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name='Дата оновлення', auto_now=True)
+    
+    
+    def __str__(self):
+        return f'{self.title} - {self.created_at} - {self.is_published}'
     
     class Meta:
         verbose_name = 'Пост'
