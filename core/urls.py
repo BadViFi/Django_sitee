@@ -26,6 +26,6 @@ app_name = 'blog'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('apps.main.urls')),
-    path('blog/',include('apps.blog.urls')),
+    path('article/',include('apps.blog.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

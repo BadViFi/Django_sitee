@@ -13,15 +13,22 @@ def index(request):
     posts = Post.objects.all()
     
     create_form = PostForm()
+    
+    counter = Post.objects.count()
+
+
 
     
     context = {
         'posts': posts,
         'form': create_form,
+        'post_count' : counter
 
     }
     
     return render(request, 'blog/index.html', context)
+
+
 
 def post(request, post_id):
     # post = Post.objects.get(id=post_id)

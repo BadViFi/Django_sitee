@@ -4,7 +4,7 @@ from django.db import models
 class Post(models.Model):
     title = models.CharField(verbose_name='Заголовок', max_length=255,blank=False)
     content = models.TextField(verbose_name='Контент',blank=False)
-    image = models.ImageField(verbose_name='Малюнок', upload_to='post_images/',default="linux")
+    image = models.ImageField(verbose_name='Малюнок', upload_to='post_images/',default="linux",blank=True)
     is_published = models.BooleanField(verbose_name='Опубліковано', default=False,blank=True)
     likes = models.IntegerField(verbose_name='Вподобайки', default=0,blank=True)
     views = models.IntegerField(verbose_name='Перегляди', default=0,blank=True)
