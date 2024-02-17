@@ -1,27 +1,35 @@
+
+
+
 <a class="btn btn-outline-primary btn-sm" href="{% url 'admin:index' %}">Admin</a>
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container">
-      <a class="navbar-brand" href="{% url 'main:ja sigma' %}">About Us</a>
+      <a class="navbar-brand" href="{% url 'main:index' %}"><img src="https://www.svgrepo.com/show/349342/docker.svg"  width="40" height="40">SigmaPythonHUB</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{% url 'main:ja sigmach' %}">Contacts</a>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'main:ja sigma' %}">About Us</a>
           </li>
 
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{% url 'blog:index' %}">Article</a>
-        </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'main:ja sigmach' %}">Contacts</a>
+          </li>
 
-
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'blog:index' %}">Article</a>
+          </li>
         </ul>
+        
         {% comment %} <form class="d-flex" role="search">
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form> {% endcomment %}
+          <button class="btn btn-outline-success" type="submit">Search</button> {% endcomment %}
+        </form>
       </div>
     </div>
-  </nav>
+</nav>
+
+
