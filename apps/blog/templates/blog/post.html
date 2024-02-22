@@ -71,14 +71,14 @@
     });
 
 
-    {% comment %} function like_comment(comment_id){
+    function like_comment(comment_id){
         fetch('{% url "blog:like_comment" post.id 0 %}'.replace('0', comment_id))
         .then(response => response.json())
         .then(data => {
             document.getElementById('btn_like_comment_' + comment_id).innerText = `❤️ ${data.likes}`;
         })
         .catch(error => console.log(error));
-    } {% endcomment %}
+    }
 
 </script>
 
