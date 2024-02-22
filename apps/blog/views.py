@@ -1,5 +1,69 @@
-from django.shortcuts import render,HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
+
+from .models import Post
+
+from .forms import PostForm,CommentForm
+
+
 
 # Create your views here.
 def index(request):
-    return render(request, 'blog/index.html')
+    
+    posts = Post.objects.all()
+    
+    create_form = PostForm()
+    
+    counter = Post.objects.count()
+
+
+
+    
+    context = {
+        'posts': posts,
+        'form': create_form,
+        'post_count' : counter
+
+    }
+    
+    return render(request, 'blog/index.html', context)
+
+
+
+def post(request, post_id):
+    # post = Post.objects.get(id=post_id)
+    
+    form_comment = CommentForm()
+    post = get_object_or_404(Post, id=post_id)
+    context = {
+        'post': post,
+        "comment_form" : form_comment,
+    }
+    return render(request, 'blog/post.html', context)
+    
+    
+def create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+    return redirect('blog:index')
+
+
+def comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            print(comment)
+            comment.post = post
+            comment.save()
+    return redirect('blog:post', post_id=post_id)
+
+
+def like(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    post.likes += 1
+    post.save()
+    return JsonResponse({'likes': post.likes})

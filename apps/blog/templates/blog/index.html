@@ -1,45 +1,90 @@
 {% extends "base.html" %}
 
-{% block title %}Blog{% endblock %}
+{% load static %}
+
+{% block title %}Article{% endblock %}
+
 
 {% block content %}
+
+
+
+
+
     <div class="mt-3 rounded-3 bg-body-tertiary p-4">
         <h3>Блог</h3>
-        <p>Тут будет блог</p>
-        <hr class="my-4">
-        <div class="row g-4">
-            <div class="col-4"> 
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                </div>
-            </div>
+        <h1>Всего опубликовано постов: {{post_count}} </h1>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" style="background-color: #4e4e4e; color: white; border-color: #4e4e4e;">
+        Створити пост
+    </button>
 
-            <div class="col-4"> 
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-4">
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
+    <div class="row g-4">
+        {% for post in posts %}
+            <div class="col-4">
+                <a href="{% url 'blog:post' post.id %}" class="text-decoration-none text-white">
+            
+                    <div class="card">
+                        <img src="{{post.image.url}}" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">{{post.title}}</h5>
+                            <small class="text-muted">{{post.created_at}}</small>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between text-center">
+                                <h5><span class="badge ">👀 {{post.views}}</span></h5>
+                                <h5><span class="badge ">📝 {{post.comments.count}}</span></h5>
+                                <h5><span class="badge ">👍 {{post.likes}}</span></h5>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Створити пост</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="{% url 'blog:create' %}" method="post" enctype="multipart/form-data">
+
+            <div class="modal-body">
+                {% csrf_token %}
+                {{ form }}
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Створити</button>
+                
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('btn_like').addEventListener('click', function(){
+        fetch('{% url "blog:like" post.id %}')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('btn_like').innerText = `👍 ${data.likes}`;
+        })
+        .catch(error => console.log(error));
+    });
+
+
+</script>
+
+
+
+
+
 {% endblock %}
+
+
+
+  
