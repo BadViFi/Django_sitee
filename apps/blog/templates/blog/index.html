@@ -22,26 +22,28 @@
     <div class="row g-4">
         {% for post in posts %}
             <div class="col-4">
-                <a href="{% url 'blog:post' post.id %}" class="text-decoration-none text-white">
             
                     <div class="card">
+                        <a href="{% url 'blog:post' post.id %}" class="text-decoration-none text-white">
                         <img src="{{post.image.url}}" class="card-img-top" alt="...">
                         <div class="card-body">
                             <h5 class="card-title">{{post.title}}</h5>
                             <small class="text-muted">{{post.created_at}}</small>
                         </div>
+                    </a>
                         <div class="card-footer">
-                            <div class="d-flex justify-content-between text-center">
+                            <div class="d-flex justify-content-between text-center ">
                                 <h5><span class="badge ">👀 {{post.views}}</span></h5>
                                 <h5><span class="badge ">📝 {{post.comments.count}}</span></h5>
-                                <h5><span class="badge ">👍 {{post.likes}}</span></h5>
+                                <h5><span class="btn" id="btn_like_{{post.id}}" style="cursor: pointer;">👍 {{post.likes}}</span></h5>
+                                <h5><span class="btn" id="btn_dis_like_{{post.id}}" style="cursor: pointer;">👎 {{post.dis_likes}}</span></h5>
                             </div>
                         </div>
                     </div>
-                </a>
+                
+  
             </div>
         {% endfor %}
-
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -67,17 +69,39 @@
   </div>
 
   <script>
-    document.getElementById('btn_like').addEventListener('click', function(){
-        fetch('{% url "blog:like" post.id %}')
+    
+    function like(post_id){
+        fetch('{% url "blog:like" 0 %}'.replace('0', post_id))
         .then(response => response.json())
         .then(data => {
-            document.getElementById('btn_like').innerText = `👍 ${data.likes}`;
+            document.getElementById('btn_like_' + post_id).innerText = `👍 ${data.likes}`;
         })
-        .catch(error => console.log(error));
-    });
+    }
 
-
+    {% for post in posts %}
+        document.getElementById('btn_like_{{post.id}}').addEventListener('click', function(){
+            like({{post.id}});
+        });
+    {% endfor %}
 </script>
+
+<script>
+    
+    function dis_like(post_id){
+        fetch('{% url "blog:dis_like" 0 %}'.replace('0', post_id))
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('btn_dis_like_' + post_id).innerText = `👎 ${data.dis_likes}`;
+        })
+    }
+
+    {% for post in posts %}
+        document.getElementById('btn_dis_like_{{post.id}}').addEventListener('click', function(){
+            dis_like({{post.id}});
+        });
+    {% endfor %}
+</script>
+  
 
 
 
