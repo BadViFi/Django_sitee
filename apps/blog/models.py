@@ -7,6 +7,7 @@ class Post(models.Model):
     image = models.ImageField(verbose_name='Малюнок', upload_to='post_images/',default="linux",blank=True)
     is_published = models.BooleanField(verbose_name='Опубліковано', default=False,blank=True)
     likes = models.IntegerField(verbose_name='Вподобайки', default=0,blank=True)
+    dis_likes = models.IntegerField(verbose_name='Огидайки', default=0,blank=True)
     views = models.IntegerField(verbose_name='Перегляди', default=0,blank=True)
     created_at = models.DateTimeField(verbose_name='Дата створення', auto_now_add=True,blank=True)
     updated_at = models.DateTimeField(verbose_name='Дата оновлення', auto_now=True,blank=True)

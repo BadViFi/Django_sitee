@@ -35,6 +35,7 @@
                             <div class="d-flex justify-content-between text-center">
                                 <h5><span class="badge ">👀 {{post.views}}</span></h5>
                                 <h5><span class="badge ">📝 {{post.comments.count}}</span></h5>
+                                <h5><span class="badge ">👎 {{post.comments}}</span></h5>
                                 <h5><span class="btn" id="btn_like_{{post.id}}" style="cursor: pointer;">👍 {{post.likes}}</span></h5>
                             </div>
                         </div>
@@ -43,7 +44,6 @@
   
             </div>
         {% endfor %}
-
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
