@@ -69,6 +69,14 @@ def like(request, post_id):
     return JsonResponse({'likes': post.likes})
 
 
+def dis_like(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    post.dis_likes += 1
+    post.save()
+    return JsonResponse({'dis_likes': post.dis_likes})
+
+
+
 
 
 def like_comment(request, post_id, comment_id):
