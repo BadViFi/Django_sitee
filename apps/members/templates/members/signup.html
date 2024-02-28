@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}ЛОГІН{% endblock %}
+
+
+
+{% block content %}
+
+<div class="mt-4 rounded-3 bg-body-tertiary p-4">
+        <h3 class="text-center">Зареєструватися</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label">Ім'я користувача</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="first_name" class="form-label">Ім'я</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="last_name" class="form-label">Прізвище</label>
+                <input type="text" class="form-control" id="last_name" name="last_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Електронна пошта</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password1" class="form-label">Пароль</label>
+                <input type="password" class="form-control" id="password1" name="password1" required>
+            </div>
+            <div class="mb-3">
+                <label for="password2" class="form-label">Підтвердження паролю</label>
+                <input type="password" class="form-control" id="password2" name="password2" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Зареєструватися</button>
+        </form>
+{% endblock %}

@@ -1,7 +1,11 @@
 from django.db import models
+from django.contrib.auth.models import User
+
 
 # Create your models here.
 class Post(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор', related_name='posts', null=True, default=None)
+        
     title = models.CharField(verbose_name='Заголовок', max_length=255,blank=False)
     content = models.TextField(verbose_name='Контент',blank=False)
     image = models.ImageField(verbose_name='Малюнок', upload_to='post_images/',default="linux",blank=True)
