@@ -35,6 +35,8 @@ def post(request, post_id):
     
     form_comment = CommentForm()
     post = get_object_or_404(Post, id=post_id)
+    post.views += 1
+    post.save()
     context = {
         'post': post,
         "comment_form" : form_comment,
