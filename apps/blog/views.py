@@ -52,6 +52,7 @@ def create(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
+
     return redirect('blog:index')
 
 @login_required
@@ -89,3 +90,5 @@ def like_comment(request, post_id, comment_id):
     comment.likes += 1
     comment.save()
     return JsonResponse({'likes': comment.likes})
+
+# tx])YH6QVr%W-C
