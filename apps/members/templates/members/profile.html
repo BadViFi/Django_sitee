@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Профіль{% endblock %}
+
+
+
+{% block content %}
+
+<div class="mt-4 rounded-3 bg-body-tertiary p-4">
+        <h3 class="text-center">Профіль</h3>
+        <p>Ім'я користувача: {{ user.username }}</p>
+        <p>Ім'я: {{ user.first_name }}</p>
+        <p>Прізвище: {{ user.last_name }}</p>
+        <p>Електронна пошта: {{ user.email }}</p>
+        <p>Дата реєстрації: {{ user.date_joined }}</p>
+        <p>Дата останнього входу: {{ user.last_login }}</p>
+
+        
+</div>
+<div class="mt-4 rounded-3 bg-body-tertiary p-4">
+        <h3 class="text-center">Ваші пости</h3>
+        <center>
+        <h5>Кількість постів: {{counter}} </h5>
+        </center>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Створити пост
+             </button>
+        <hr class="my-4">
+        <div class="row g-4">
+            {% for post in user.posts.all %}
+                <div class="col-4">
+                      <div class="card">
+                        <div class="card-header {% if post.is_published %}bg-success{% else %}bg-warning{% endif %} text-white">
+                          <a href="" class="btn btn-sm btn-success">Редагувати</a>
+                          <a href="{% url 'blog:delete_post' post.id %}" class="btn btn-sm btn-danger">Видалити</a>
+                      </div>
+                    
+                        <a href="{% url 'blog:post' post.id %}" class="text-decoration-none text-white">
+                        <img src="{{post.image.url}}" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">{{post.title}}</h5>
+                                <p class="card-text">@{{post.author}}</p>
+                                <small class="text-muted">{{post.created_at|timesince}}</small>
+                        </div>
+                        </a>
+                                <div class="card-footer">
+                                        <div class="d-flex justify-content-between text-center">
+                                        <h5><span class="badge ">👀 {{post.views}}</span></h5>
+                                        <h5><span class="badge ">📝 {{post.comments.count}}</span></h5>
+                                        <h5><span class="btn" id="btn_like_{{post.id}}" style="cursor: pointer;">👍 {{post.likes.count}}</span></h5>
+                                        <h5><span class="btn" id="btn_dis_like_{{post.id}}" style="cursor: pointer;">👎 {{post.dis_likes}}</span></h5>
+                                        </div>
+                                </div>
+                        </div>
+                </div>
+                {% endfor %}
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Створити пост</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'blog:create' %}" method="post" enctype="multipart/form-data">
+    
+                <div class="modal-body">
+                    {% csrf_token %}
+                    {{ form_create_post }}
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Створити</button>
+                    
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+{% endblock %}
