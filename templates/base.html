@@ -1,20 +1,31 @@
-{% include 'include_block/_main_navbar.html' %}
- 
- <div class="container">
-    {% block content %}{% endblock %}
-  </div>
-  
-
-  
-  
-  <!doctype html>
-  <html lang="uk-ua" data-bs-theme="dark">
+<!doctype html>
+  <html lang="en" data-bs-theme="dark">
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>{% block title %}{% endblock %} -SigmaPythonHUB</title>
-    
-
+      <title>{% block title %}{% endblock %}-SigmaPythonHUB</title>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    </head>
+    <body>
+      
+      {% include 'include_block/_main_navbar.html' %}
+      
+      
+      
+      <div class="container">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="mt-3 alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+          {% block content %}{% endblock %}
+      </div>
+  
+  
+  
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     </head>
     <body>

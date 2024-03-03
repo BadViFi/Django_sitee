@@ -1,12 +1,16 @@
 from django.db import models
+from django.contrib.auth.models import User
+
 
 # Create your models here.
 class Post(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор', related_name='posts', null=True, default=None)
+        
     title = models.CharField(verbose_name='Заголовок', max_length=255,blank=False)
     content = models.TextField(verbose_name='Контент',blank=False)
     image = models.ImageField(verbose_name='Малюнок', upload_to='post_images/',default="linux",blank=True)
     is_published = models.BooleanField(verbose_name='Опубліковано', default=False,blank=True)
-    likes = models.IntegerField(verbose_name='Вподобайки', default=0,blank=True)
+    likes = models.ManyToManyField(User, related_name='post_likes', blank=True)
     dis_likes = models.IntegerField(verbose_name='Огидайки', default=0,blank=True)
     views = models.IntegerField(verbose_name='Перегляди', default=0,blank=True)
     created_at = models.DateTimeField(verbose_name='Дата створення', auto_now_add=True,blank=True)
@@ -23,9 +27,9 @@ class Post(models.Model):
         
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name='Пост', related_name='comments')
-    author = models.CharField(verbose_name='Автор', max_length=50)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор', related_name='comments', null=True, default=None)
     content = models.TextField(verbose_name='Контент')
-    likes = models.IntegerField(verbose_name='Вподобайки', default=0, blank=True)
+    likes = models.ManyToManyField(User, related_name='comment_likes', blank=True)
     created_at = models.DateTimeField(verbose_name='Дата створення', auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name='Дата оновлення', auto_now=True)
     
