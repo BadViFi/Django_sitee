@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import  AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from apps.blog.models import Post
 
 
 from .forms import UserCreateForm
@@ -55,7 +56,8 @@ def signup_view(request):
 def profile_view(request):
     form_create_post = PostForm()
     context = {
-        'form_create_post': form_create_post
+        'form_create_post': form_create_post,
+        'counter' : Post.objects.filter(is_published=True).count()
     }
     
     return render(request, 'members/profile.html', context)

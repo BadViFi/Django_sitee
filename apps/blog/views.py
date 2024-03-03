@@ -20,14 +20,11 @@ def index(request):
     
     counter = Post.objects.count()
 
-
-
     
     context = {
         'posts': posts,
         'form': create_form,
         'post_count' : counter
-
     }
     
     return render(request, 'blog/index.html', context)
