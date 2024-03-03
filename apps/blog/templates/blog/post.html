@@ -15,51 +15,44 @@
             <h5><span class="badge ">👀 {{post.views}}</span></h5>
             <h5><span class="badge ">📝 {{post.comments.count}}</span></h5>
             <h5><span class="btn btn-secondary" id = "btn_dis_like">👎 {{post.dis_likes}}</span></h5>
-            <h5><span class="btn btn-secondary" id = "btn_like">👍 {{post.likes}}</span></h5>
+            <h5><span class="btn btn-secondary" id = "btn_like">👍 {{post.likes.count}}</span></h5>
         </div>
         <hr class="my-4">
         <p>{{post.content}}</p>
-    </div>
-
-    
-    <div class="mt-3 rounded-3 bg-body-tertiary p-4">
-        <h5>Коментарі</h5>
-        📝 {{post.comments.count}}
-        <hr class"mx-2">
-        {{post.comments.count.all}}
-        <form action="{% url 'blog:comment' post.id %}" method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="name" class="form-label">Ваше ім'я</label>
-                <input type="text" class="form-control" id="name" name="author">
             </div>
-            <div class="mb-3">
-                <label for="comment" class="form-label">Ваш коментар</label>
-                <textarea class="form-control" id="comment" name="content" rows="3"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Відправити</button>
-        </form>
-        <hr class="my-4">
-        {%for comment in post.comments.all%}
-        <div class="d-flex justify-content-between">
-                    
-            <div>
-                <button type="button" class="btn btn-secondary" onclick="like_comment({{comment.id}})" id="btn_like_comment_{{comment.id}}">❤️ {{comment.likes}}</button>
-
-                <h5>{{comment.author}}</h5>
-                <p>{{comment.content}}</p>
-            </div>
-            <div>
-                <small class="text-muted text-end">{{comment.created_at}}</small>
-            </div>
+            <hr class="my-4">
+            <p>{{post.content}}</p>
         </div>
-        <hr>
+        <div class="mt-3 rounded-3 bg-body-tertiary p-4">
+            <h5>Коментарі</h5>
+            🗨️ {{post.comments.count}}
+            <hr class="mx-2">
+            <form action="{% url 'blog:comment' post.id %}" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="comment" class="form-label">Ваш коментар</label>
+                    <textarea class="form-control" id="comment" name="content" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Відправити</button>
+            </form>
+            <hr class="my-4">
+            {%for comment in post.comments.all%}
+                <div class="d-flex justify-content-between">
+                    
+                    <div>
+                        <button type="button" class="btn btn-secondary" onclick="like_comment({{comment.id}})" id="btn_like_comment_{{comment.id}}">❤️ {{comment.likes.count}}</button>
 
-    {%endfor%}
-</div>
+                        <h5>{{comment.author}}</h5>
+                        <p>{{comment.content}}</p>
+                    </div>
+                    <div>
+                        <small class="text-muted text-end">{{comment.created_at}}</small>
+                    </div>
+                </div>
+                <hr>
+            {%endfor%}
+        </div>
 
-
-    </div>
 
 <script>
     document.getElementById('btn_like').addEventListener('click', function(){
@@ -71,7 +64,6 @@
         .catch(error => console.log(error));
     });
 
-
     function like_comment(comment_id){
         fetch('{% url "blog:like_comment" post.id 0 %}'.replace('0', comment_id))
         .then(response => response.json())
@@ -82,19 +74,4 @@
     }
 
 </script>
-
-
-<script>
-    document.getElementById('btn_dis_like').addEventListener('click', function(){
-        fetch('{% url "blog:dis_like" post.id %}')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('btn_dis_like').innerText = `👎 ${data.dis_likes}`;
-        })
-        .catch(error => console.log(error));
-    });
-</script>
-
-
-
 {% endblock %}
