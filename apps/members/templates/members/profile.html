@@ -31,10 +31,12 @@
             {% for post in user.posts.all %}
                 <div class="col-4">
                       <div class="card">
+                        <center>
                         <div class="card-header {% if post.is_published %}bg-success{% else %}bg-warning{% endif %} text-white">
                           <a href="" class="btn btn-sm btn-success">Редагувати</a>
                           <a href="{% url 'blog:delete_post' post.id %}" class="btn btn-sm btn-danger">Видалити</a>
                       </div>
+                    </center>
                     
                         <a href="{% url 'blog:post' post.id %}" class="text-decoration-none text-white">
                         <img src="{{post.image.url}}" class="card-img-top" alt="...">
