@@ -33,8 +33,8 @@
                       <div class="card">
                         <center>
                         <div class="card-header {% if post.is_published %}bg-success{% else %}bg-warning{% endif %} text-white">
-                          <a href="" class="btn btn-sm btn-success">Редагувати</a>
-                          <a href="{% url 'blog:delete_post' post.id %}" class="btn btn-sm btn-danger">Видалити</a>
+                          <a href="{% url 'blog:edit_post' post.id %}" class="btn btn-sm btn-outline-light">Редагувати</a>
+                          <a href="{% url 'blog:delete_post' post.id %}" class="btn btn-sm btn-outline-light">Видалити</a>
                       </div>
                     </center>
                     
