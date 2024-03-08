@@ -18,10 +18,10 @@
             <small class="text-muted">{{post.author}}</small>
             <small class="text-muted">{{post.category}}</small>
             <div class="d-flex justify-content-between text-center">
-                <h5><span class="badge ">👁️ {{post.views}}</span></h5>
-                <h5><span class="badge ">🗨️ {{post.comments.count}}</span></h5>
-                <h5><span class="btn btn-secondary" id = "btn_dis_like">👎 {{post.dis_likes}}</span></h5>
-                <h5><span class="btn btn-secondary" id="btn_like">👍 {{post.likes.count}}</span></h5>
+                <h5><span class="badge ">👀 {{post.views}}</span></h5>
+                <h5><span class="badge ">📝 {{post.comments.count}}</span></h5>
+                <h5><span class="btn" id="btn_like_{{post.id}}" style="cursor: pointer;">👍 {{post.likes.count}}</span></h5>
+                <h5><span class="btn" id="btn_dis_like_{{post.id}}" style="cursor: pointer;">👎 {{post.dis_likes}}</span></h5>
             </div>
             <hr class="my-4">
             <p>{{post.content}}</p>

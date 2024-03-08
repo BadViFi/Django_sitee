@@ -22,23 +22,29 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'blog:index' %}">Article</a>
           </li>
+
         </ul>
-        
-         {% comment %} <form class="d-flex" role="search">
+        <!-- <form class="d-flex" role="search">
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button> 
-        </form> {% endcomment %}
+          <button class="btn btn-success" type="submit">Search</button>
+        </form> -->
         <div class="d-flex gap-2">
           {% if user.is_authenticated %}
-            <a class="btn btn-outline-primary btn-sm" href="{% url 'members:logout' %}">Вийти</a>
-            <a class="btn btn-primary btn-sm " href="{% url 'members:profile' %}">Профіль</a>
-
+          <div class="dropdown text-end">
+            <a href="" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="{{user.profile.get_avatar}}" alt="mdo" width="32" height="32" class="rounded-circle">
+            </a>
+            <ul class="dropdown-menu text-small" style="">
+              <li><a class="dropdown-item" href="{% url 'members:profile' %}">Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% url 'members:logout' %}">Sign out</a></li>
+            </ul>
+          </div>
             {% else %}
             <a class="btn btn-outline-primary btn-sm" href="{% url 'members:login' %}">Увійти</a>
             <a class="btn btn-outline-warning btn-sm" href="{% url 'members:signup' %}">Зареєструватися</a>
           {% endif %}
       </div>
     </div>
-</nav>
-
+  </nav>
 

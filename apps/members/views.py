@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import  AuthenticationForm
@@ -55,11 +55,12 @@ def signup_view(request):
 @login_required
 def profile_view(request):
     form_create_post = PostForm()
+    user = request.user
+    post_count = Post.objects.filter(author=user, is_published=True).count()
     context = {
         'form_create_post': form_create_post,
-        'counter' : Post.objects.filter(is_published=True).count()
+        'counter': post_count
     }
-    
     return render(request, 'members/profile.html', context)
 
 
