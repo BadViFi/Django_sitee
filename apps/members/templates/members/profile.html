@@ -8,13 +8,14 @@
 {% block content %}
 
 <div class="mt-4 rounded-3 bg-body-tertiary p-4">
-        <h3 class="text-center">Профіль</h3>
-        <p>Ім'я користувача: {{ user.username }}</p>
-        <p>Ім'я: {{ user.first_name }}</p>
-        <p>Прізвище: {{ user.last_name }}</p>
-        <p>Електронна пошта: {{ user.email }}</p>
-        <p>Дата реєстрації: {{ user.date_joined }}</p>
-        <p>Дата останнього входу: {{ user.last_login }}</p>
+  <h3 class="text-center">Профіль</h3>
+  <img src="{{user.profile.get_avatar}}" class="img-fluid rounded-circle" width="100" alt="...">
+  <p>Ім'я користувача: {{ user.username }}</p>
+  <p>Ім'я: {{ user.first_name }}</p>
+  <p>Прізвище: {{ user.last_name }}</p>
+  <p>Електронна пошта: {{ user.email }}</p>
+  <p>Дата реєстрації: {{ user.date_joined }}</p>
+  <p>Дата останнього входу: {{ user.last_login }}</p>
 
         
 </div>
@@ -32,14 +33,15 @@
                 <div class="col-4">
                       <div class="card">
                         <center>
-                        <div class="card-header {% if post.is_published %}bg-success{% else %}bg-warning{% endif %} text-white">
-                          <a href="" class="btn btn-sm btn-success">Редагувати</a>
-                          <a href="{% url 'blog:delete_post' post.id %}" class="btn btn-sm btn-danger">Видалити</a>
-                      </div>
-                    </center>
+                          <div class="card-header {% if post.is_published %}bg-success{% else %}bg-warning{% endif %} text-white">
+                            <a href="" class="btn btn-sm btn-success" style="border-color: white; color: white;">Редагувати</a>
+                            <a href="{% url 'blog:delete_post' post.id %}" class="btn btn-sm btn-danger" style="border-color: white; color: white;">Видалити</a>
+                            
+                        </div>
+                      </center>
                     
                         <a href="{% url 'blog:post' post.id %}" class="text-decoration-none text-white">
-                        <img src="{{post.image.url}}" class="card-img-top" alt="...">
+                        <img src="{{post.get_thumbnail}}" class="card-img-top" alt="...">
                         <div class="card-body">
                             <h5 class="card-title">{{post.title}}</h5>
                                 <p class="card-text">@{{post.author}}</p>
