@@ -5,8 +5,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.files import File
 
-from io import BytesIO
-from PIL import Image
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
 
 
 # Create your models here.
@@ -16,7 +16,10 @@ class Post(models.Model):
     title = models.CharField(verbose_name='Заголовок', max_length=255,blank=False)
     content = models.TextField(verbose_name='Контент',blank=False)
     image = models.ImageField(verbose_name='Малюнок', upload_to='post_images/',default="linux",blank=True)
-    image_thumbnail = models.ImageField(verbose_name='Мініатюра', upload_to='post_images/', blank=True)
+    thumbnail = ImageSpecField(source='image',
+                                      processors=[ResizeToFill(820, 440)],
+                                      format='JPEG',
+                                      options={'quality': 60})
     is_published = models.BooleanField(verbose_name='Опубліковано', default=False,blank=True)
     likes = models.ManyToManyField(User, related_name='post_likes', blank=True)
     dis_likes = models.IntegerField(verbose_name='Огидайки', default=0,blank=True)
@@ -33,36 +36,26 @@ class Post(models.Model):
         verbose_name_plural = 'Пости'
         ordering = ['-created_at']
         
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)     
-        if self.image:
-            self.make_thumbnail(self.image)
-            super().save(*args, **kwargs)
+
                 
     def get_thumbnail(self):
-        if self.image_thumbnail:
-            return self.image_thumbnail.url
+        if self.thumbnail:
+            return self.thumbnail.url
         else:
-            if self.image:
-                self.image_thumbnail = self.make_thumbnail(self.image)
-                self.save()
-
-                return self.image_thumbnail.url
-            else:
-                return 'https://via.placeholder.com/240x240x.jpg'
+            return 'https://via.placeholder.com/240x240.jpg'
     
-    def make_thumbnail(self, image, size=(820, 440)):
-        img = Image.open(image)
-        img.convert('RGBA')
-        img.thumbnail(size)
-        img = img.resize(size, Image.LANCZOS)
+    # def make_thumbnail(self, image, size=(820, 440)):
+    #     img = Image.open(image)
+    #     img.convert('RGBA')
+    #     img.thumbnail(size)
+    #     img = img.resize(size, Image.LANCZOS)
 
-        thumb_io = BytesIO()
-        img.save(thumb_io, 'PNG', quality=85)
-        name = image.name.replace('post_images/', 'thumbnails/')
-        thumbnail = File(thumb_io, name=name)
+    #     thumb_io = BytesIO()
+    #     img.save(thumb_io, 'PNG', quality=85)
+    #     name = image.name.replace('post_images/', 'thumbnails/')
+    #     thumbnail = File(thumb_io, name=name)
 
-        return thumbnail
+    #     return thumbnail
         
         
         

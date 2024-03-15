@@ -1,11 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
+
 
 # Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     avatar = models.ImageField(verbose_name='Аватар', upload_to='avatars/', default='avatars/default.png')
+    avatar_thumbnail = ImageSpecField(source='avatar',
+                                      processors=[ResizeToFill(300, 300)],
+                                      format='JPEG',
+                                      options={'quality': 60})
     bio = models.TextField(verbose_name='Біографія', blank=True)
     birth_date = models.DateField(verbose_name='Дата народження', null=True, blank=True)
     location = models.CharField(verbose_name='Місце проживання', max_length=255, blank=True)

@@ -9,6 +9,7 @@ from apps.blog.models import Post
 
 from .forms import UserCreateForm
 from apps.blog.forms import PostForm
+from .models import Profile
 # Create your views here.
 
 def login_view(request):
@@ -44,6 +45,7 @@ def signup_view(request):
             user.last_name = form.cleaned_data.get('last_name')
             user.email = form.cleaned_data.get('email')
             user.save()
+            Profile.objects.create(user=user)
             login(request, user)
             messages.success(request, f'Ви успішно зареєструвалися як {user.username}')
             return redirect('members:profile')
