@@ -20,7 +20,9 @@ class Profile(models.Model):
     phone = models.CharField(verbose_name='Телефон', max_length=15, blank=True)
     
     def get_avatar(self):
-        if self.avatar == '/avatars/default.png':
-            return self.avatar.url
-        #static avatar/default.png
-        return '/static/avatars/default.png'
+        if self.avatar:
+            return self.avatar_thumbnail.url
+        return '/media/avatars/default.png'
+    
+    def __str__(self):
+        return f'{self.user.username}'

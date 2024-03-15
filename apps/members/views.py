@@ -1,13 +1,17 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import  AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+
+# obligation
 from apps.blog.models import Post
+# obligation
 
 
-from .forms import UserCreateForm
+
+from .forms import UserCreateForm, ProfileUpdateForm , UserUpdateForm
 from apps.blog.forms import PostForm
 from .models import Profile
 # Create your views here.
@@ -57,12 +61,30 @@ def signup_view(request):
 @login_required
 def profile_view(request):
     form_create_post = PostForm()
-    user = request.user
-    post_count = Post.objects.filter(author=user, is_published=True).count()
+    uuser = request.user
+    user_form = UserUpdateForm(instance=request.user)
+    profile_form = ProfileUpdateForm(instance=request.user.profile)
+    post_count = Post.objects.filter(author=uuser, is_published=True).count()
     context = {
         'form_create_post': form_create_post,
-        'counter': post_count
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'counter': post_count,
     }
+    
     return render(request, 'members/profile.html', context)
 
 
+
+@login_required
+def profile_update_view(request):
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, 'Ваш профіль успішно оновлено')
+        else:
+            messages.error(request, 'Вибачте, щось пішло не так')
+    return redirect('members:profile')

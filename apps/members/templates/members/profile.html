@@ -71,25 +71,33 @@
                 {% endfor %}
 
 
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+<div class="mt-4 rounded-3 bg-body-tertiary p-4">
+        <h3 class="text-center">Ваші пости</h3>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Створити пост
+             </button>
+        <hr class="my-4">
+        {% comment %} {% include 'blog/_include_blocks/_posts_show.html' with posts=user.posts.all edit=True %} {% endcomment %}
+    </div>
+
+
+
+
+      <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">Створити пост</h1>
+              <h1 class="modal-title fs-5" id="editProfileModalLabel">Редагувати профіль</h1>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{% url 'blog:create' %}" method="post" enctype="multipart/form-data">
-    
-                <div class="modal-body">
-                    {% csrf_token %}
-                    {{ form_create_post }}
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Створити</button>
-                    
-                </div>
-            </form>
+            <div class="modal-body">
+              <form action="{% url 'members:profile_update' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ user_form}}
+                {{ profile_form }}
+                <button type="submit" class="btn btn-primary mt-4">Зберегти</button>
+              </form>
           </div>
         </div>
       </div>
