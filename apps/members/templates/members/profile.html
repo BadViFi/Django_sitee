@@ -90,6 +90,9 @@
 
 <div class="mt-4 rounded-3 bg-body-tertiary p-4">
         <h3 class="text-center">Пости</h3>
+        <center>
+          <h5>Кількість постів: {{counter}} </h5>
+        </center>
         {% if not another_user %}
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Створити пост
@@ -162,43 +165,8 @@
 
 </script>
 
-{% comment %} <script>
-    
-  function dis_like(post_id){
-      fetch('{% url "blog:dis_like" 0 %}'.replace('0', post_id))
-      .then(response => response.json())
-      .then(data => {
-          document.getElementById('btn_dis_like_' + post_id).innerText = `👎 ${data.dis_likes}`;
-      })
-  }
-
-  {% for post in posts %}
-      document.getElementById('btn_dis_like_{{post.id}}').addEventListener('click', function(){
-          dis_like({{post.id}});
-      });
-  {% endfor %}
-</script> {% endcomment %}
-
 {% endblock %}
 
 
 
 
-
-
-
-
-
-
-
-{% comment %} <div class="mt-4 rounded-3 bg-body-tertiary p-4">
-  <h3 class="text-center">Ваші пости</h3>
-  <center>
-  <h5>Кількість постів: {{counter}} </h5>
-  </center>
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Створити пост
-       </button>
-  <hr class="my-4">
-  {% include 'blog/_include_blocks/_posts_show.html' with posts=user.posts.all edit=True %}
-</div> {% endcomment %}
