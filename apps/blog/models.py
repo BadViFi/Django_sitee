@@ -9,13 +9,23 @@ from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 
 
+def generate_filename(instance, filename):
+    # Отримати розширення файлу
+    ext = filename.split('.')[-1]
+    # Генерувати унікальний ідентифікатор
+    filename = f'{uuid.uuid4()}.{ext}'
+    return f'post_images/{filename}'
+
+
+
+
 # Create your models here.
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор', related_name='posts', null=True, default=None)
         
     title = models.CharField(verbose_name='Заголовок', max_length=255,blank=False)
     content = models.TextField(verbose_name='Контент',blank=False)
-    image = models.ImageField(verbose_name='Малюнок', upload_to='post_images/',default="linux",blank=True)
+    image = models.ImageField(verbose_name='Малюнок', upload_to=generate_filename)
     thumbnail = ImageSpecField(source='image',
                                       processors=[ResizeToFill(820, 440)],
                                       format='JPEG',
@@ -58,7 +68,7 @@ class Post(models.Model):
     #     return thumbnail
         
         
-        
+    
         
         
 class Comment(models.Model):

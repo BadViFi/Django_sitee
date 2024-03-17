@@ -95,6 +95,27 @@
         });
     {% endfor %}
 </script>
+
+
+
+
+
+<script>
+    
+  function dis_like(post_id){
+      fetch('{% url "blog:dis_like" 0 %}'.replace('0', post_id))
+      .then(response => response.json())
+      .then(data => {
+          document.getElementById('btn_dis_like_' + post_id).innerText = `👎 ${data.dis_likes}`;
+      })
+  }
+
+  {% for post in posts %}
+      document.getElementById('btn_dis_like_{{post.id}}').addEventListener('click', function(){
+          dis_like({{post.id}});
+      });
+  {% endfor %}
+</script>
   
 
 {% endblock %}
