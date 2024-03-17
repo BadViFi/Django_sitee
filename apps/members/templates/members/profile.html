@@ -26,6 +26,10 @@
           <p>Електронна пошта: {{ user.email }}</p>
           <p>Дата реєстрації: {{ user.date_joined }}</p>
           <p>Дата останнього входу: {{ user.last_login }}</p>
+          <p>Біо: {{ user.profile.bio|safe }}</p>
+          <p>Дата народження: {{ user.profile.birth_date }}</p>
+          <p>Місце проживання: {{ user.profile.location }}</p>
+          
         </div>
     </div>
 </div>

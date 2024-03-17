@@ -46,6 +46,8 @@ def post(request, post_id):
 @login_required
 def create(request):
     if request.method == 'POST':
+        print(request.POST)
+        print(request.FILES)
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)

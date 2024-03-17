@@ -4,8 +4,10 @@
             <div class="card">
                 {% if edit %}
                 <div class="card-header {% if post.is_published %}bg-success{% else %}bg-warning{% endif %} text-white">
-                    <a href="{% url 'blog:edit_post' post.id %}" class="btn btn-sm btn-outline-light">Редагувати</a>
-                        <a href="{% url 'blog:delete_post' post.id %}" class="btn btn-sm btn-outline-light">Видалити</a>
+                    {% comment %} <a href="{% url 'blog:edit_post' post.id %}" class="btn btn-sm btn-outline-light">Редагувати</a>
+                        <a href="{% url 'blog:delete_post' post.id %}" class="btn btn-sm btn-outline-light">Видалити</a> {% endcomment %}
+                    <a href="{% url 'blog:edit_post' post.id %}" class="btn btn-sm btn-success" style="border-color: white; color: white;">Редагувати</a>
+                    <a href="{% url 'blog:delete_post' post.id %}" class="btn btn-sm btn-danger" style="border-color: white; color: white;">Видалити</a>
                 </div>
                 {% endif %}
                 {% include 'blog/_include_blocks/_card_post.html' with post=post %}

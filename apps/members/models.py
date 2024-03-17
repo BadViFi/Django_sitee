@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 
+from ckeditor.fields import RichTextField
+
 
 # Create your models here.
 class Profile(models.Model):
@@ -13,7 +15,7 @@ class Profile(models.Model):
                                       processors=[ResizeToFill(300, 300)],
                                       format='JPEG',
                                       options={'quality': 60})
-    bio = models.TextField(verbose_name='Біографія', blank=True)
+    bio = RichTextField(verbose_name='Біографія', max_length=200, blank=True)
     birth_date = models.DateField(verbose_name='Дата народження', null=True, blank=True)
     location = models.CharField(verbose_name='Місце проживання', max_length=255, blank=True)
     website = models.URLField(verbose_name='Веб-сайт', blank=True)
