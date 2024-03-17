@@ -7,6 +7,7 @@ from django.core.files import File
 
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
+from ckeditor.fields import RichTextField
 
 
 def generate_filename(instance, filename):
@@ -24,7 +25,7 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор', related_name='posts', null=True, default=None)
         
     title = models.CharField(verbose_name='Заголовок', max_length=255,blank=False)
-    content = models.TextField(verbose_name='Контент',blank=False)
+    content = RichTextField(verbose_name='Контент')
     image = models.ImageField(verbose_name='Малюнок', upload_to=generate_filename)
     thumbnail = ImageSpecField(source='image',
                                       processors=[ResizeToFill(820, 440)],
