@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Пошук користувачів{% endblock %}
+
+
+
+{% block content %}
+
+<div class="mt-4 rounded-3 bg-body-tertiary p-4">
+        <h3 class="text-center">Пошук користувачів</h3>
+        <form method="get">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="q">
+            </div>
+            <button type="submit" class="btn btn-primary">Знайти</button>
+        </form>
+</div>
+
+{% if users %}
+<div class="mt-4 rounded-3 bg-body-tertiary p-4">
+    <h3 class="text-center">Результати пошуку</h3>
+    <hr class="my-4">
+    <div class="row g-4">
+        {% for user in users %}
+        <div class="col-12 col-md-4">
+            <div class="card">
+                <img src="{{user.profile.get_avatar}}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">{{ user.username }}</h5>
+                    <p class="card-text">{{ user.profile.bio }}</p>
+                    <a href="{% url 'members:profile' user.username %}" class="btn btn-primary">Переглянути профіль</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

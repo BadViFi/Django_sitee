@@ -11,42 +11,99 @@
   <h3 class="text-center">Профіль</h3>
   <hr class="my-4">  
     <div class="row g-4">
-        <div class="col-12 col-md-4">
-          <img src="{{user.profile.get_avatar}}" class="img-fluid rounded-circle mx-auto d-block" alt="...">
-          <div class="d-flex justify-content-center mt-2">
+      <div class="col-12 col-md-4">
+        <img src="{{profile.get_avatar}}" class="img-fluid rounded-circle mx-auto d-block" alt="...">
+        {% if not another_user %}         
+        <div class="d-flex justify-content-center mt-2">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
               Редагувати профіль
             </button>
           </div>
+          {% else %}
+          <div class="d-flex justify-content-center mt-2">
+            {% if not is_following %}
+            <a href="{% url 'members:follow' user_profile.username %}" class="btn btn-primary">Підписатися</a>
+            {% else %}
+            <a href="{% url 'members:follow' user_profile.username %}" class="btn btn-danger">Відписатися</a>
+            {% endif %}
+          </div>
+          {% endif %}
         </div>
         <div class="col-8">
-          <p>Ім'я користувача: {{ user.username }}</p>
-          <p>Ім'я: {{ user.first_name }}</p>
-          <p>Прізвище: {{ user.last_name }}</p>
-          <p>Електронна пошта: {{ user.email }}</p>
-          <p>Дата реєстрації: {{ user.date_joined }}</p>
-          <p>Дата останнього входу: {{ user.last_login }}</p>
-          <p>Біо: {{ user.profile.bio|safe }}</p>
-          <p>Дата народження: {{ user.profile.birth_date }}</p>
-          <p>Місце проживання: {{ user.profile.location }}</p>
+          <p>Ім'я користувача: {{ user_profile.username }}</p>
+          <p>Ім'я: {{ user_profile.first_name }}</p>
+          <p>Прізвище: {{ user_profile.last_name }}</p>
+          <p>Електронна пошта: {{ user_profile.email }}</p>
+          <p>Дата реєстрації: {{ user_profile.date_joined }}</p>
+          <p>Дата останнього входу: {{ user_profile.last_login }}</p>
+          <p>Біо: {{ profile.bio|safe }}</p>
+          <p>Дата народження: {{ profile.birth_date }}</p>
+          <p>Місце проживання: {{ profile.location }}</p>
           
         </div>
+        {% if profile.get_followers %}
+        <div class="col-12">
+          <hr class="my-4">
+          <h3 class="text-center">Підписки</h3>
+          <div class="row g-4">
+            {% for follower in profile.get_followers %}
+            <div class="col-12 col-md-4">
+              <div class="card">
+                <img src="{{follower.profile.get_avatar}}" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title
+                  ">{{ follower.username }}</h5>
+                  <p class="card-text">{{ follower.profile.bio }}</p>
+                  <a href="{% url 'members:profile' follower.username %}" class="btn btn-primary">Переглянути профіль</a>
+                  
+                </div>
+              </div>
+            </div>
+            {% endfor %}  
+          </div>
+        </div>
+        {% endif %}
+        {% if profile.get_followers %}
+        <div class="col-12">
+          <hr class="my-4">
+          <h3 class="text-center">Підписники</h3>
+          <div class="row g-4">
+            {% for follower in profile.get_following %}
+            <div class="col-12 col-md-4">
+              <div class="card">
+                <img src="{{follower.profile.get_avatar}}" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title
+                  ">{{ follower.username }}</h5>
+                  <p class="card-text">{{ follower.profile.bio }}</p>
+                  <a href="{% url 'members:profile' follower.username %}" class="btn btn-primary">Переглянути профіль</a>
+                  
+                </div>
+              </div>
+            </div>
+            {% endfor %}  
+          </div>
+        </div>
+        {% endif %}
     </div>
 </div>
+
 <div class="mt-4 rounded-3 bg-body-tertiary p-4">
-        <h3 class="text-center">Ваші пости</h3>
-        <center>
-        <h5>Кількість постів: {{counter}} </h5>
-        </center>
+        <h3 class="text-center">Пости</h3>
+        {% if not another_user %}
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Створити пост
              </button>
         <hr class="my-4">
-        {% include 'blog/_include_blocks/_posts_show.html' with posts=user.posts.all edit=True %}
+        {% include 'blog/_include_blocks/_posts_show.html' with posts=user_profile.posts.all edit=True %}
+        {% else %}
+        <hr class="my-4">
+        {% include 'blog/_include_blocks/_posts_show.html' with posts=user_profile.posts.all edit=False %}
+        {% endif %} 
     </div>
 
 
-
+{% if not another_user %}
 
       <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -65,5 +122,65 @@
           </div>
         </div>
       </div>
+{% endif %}
+
+
+
+<script>
+    
+  function like(post_id){
+      fetch('{% url "blog:like" 0 %}'.replace('0', post_id))
+      .then(response => response.json())
+      .then(data => {
+          document.getElementById('btn_like_' + post_id).innerText = `👍 ${data.likes}`;
+      })
+  }
+
+  {% for post in user_profile.posts.all %}
+      document.getElementById('btn_like_{{post.id}}').addEventListener('click', function(){
+          like({{post.id}});
+      });
+  {% endfor %}
+
+</script>
+
+<script>
+    
+  function dis_like(post_id){
+      fetch('{% url "blog:dis_like" 0 %}'.replace('0', post_id))
+      .then(response => response.json())
+      .then(data => {
+          document.getElementById('btn_dis_like_' + post_id).innerText = `👎 ${data.dis_likes}`;
+      })
+  }
+
+  {% for post in posts %}
+      document.getElementById('btn_dis_like_{{post.id}}').addEventListener('click', function(){
+          dis_like({{post.id}});
+      });
+  {% endfor %}
+</script>
 
 {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} <div class="mt-4 rounded-3 bg-body-tertiary p-4">
+  <h3 class="text-center">Ваші пости</h3>
+  <center>
+  <h5>Кількість постів: {{counter}} </h5>
+  </center>
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          Створити пост
+       </button>
+  <hr class="my-4">
+  {% include 'blog/_include_blocks/_posts_show.html' with posts=user.posts.all edit=True %}
+</div> {% endcomment %}

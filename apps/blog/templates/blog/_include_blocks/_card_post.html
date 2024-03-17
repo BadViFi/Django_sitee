@@ -4,9 +4,11 @@
         <h5 class="card-title">{{post.title}}</h5>
         <small class="text-muted">{{post.created_at|timesince}}</small>
         <div class="d-flex justify-content-between">
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-left">
                 <img src="{{post.author.profile.get_avatar}}" class="rounded-circle" alt="..." style="width: 30px; height: 30px;">
-                <span class="ms-2">@{{post.author}}</span>
+                <a href="{% url 'members:profile' post.author.username %}" class="text-decoration-none text-primary hover-underline">
+                    <small class="ms-3">@{{post.author.username}}</small>
+                </a>
             </div>
             <div>
                 <span class="badge bg-secondary">{{post.category}}</span>

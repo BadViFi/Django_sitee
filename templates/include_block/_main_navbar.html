@@ -23,6 +23,7 @@
             <a class="nav-link" href="{% url 'blog:index' %}">Article</a>
           </li>
 
+
         </ul>
         <!-- <form class="d-flex" role="search">
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -35,14 +36,15 @@
               <img src="{{user.profile.get_avatar}}" alt="mdo" width="32" height="32" class="rounded-circle">
             </a>
             <ul class="dropdown-menu text-small" style="">
-              <li><a class="dropdown-item" href="{% url 'members:profile' %}">Profile</a></li>
+              <li><a class="dropdown-item" href="{% url 'members:profile' user.username %}"><i class="fa-solid fa-user"></i>Профіль</a></li>
+              <li><a class="dropdown-item" href="{% url 'members:search_profile' %}"><i class="fa-solid fa-user-magnifying-glass"></i>Пошук користувачів</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="{% url 'members:logout' %}">Sign out</a></li>
+              <li><a class="dropdown-item" href="{% url 'members:logout' %}"><i class="fa-solid fa-right-from-bracket"></i>Sign out</a></li>
             </ul>
           </div>
             {% else %}
-            <a class="btn btn-outline-primary btn-sm" href="{% url 'members:login' %}">Увійти</a>
-            <a class="btn btn-outline-warning btn-sm" href="{% url 'members:signup' %}">Зареєструватися</a>
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'members:login' %}"><i class="fa-solid fa-right-to-bracket"></i>Увійти</a>
+            <a class="btn btn-outline-warning btn-sm" href="{% url 'members:signup' %}"><i class="fa-solid fa-user-plus"></i>Зареєструватися</a>
           {% endif %}
       </div>
     </div>

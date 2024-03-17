@@ -21,6 +21,23 @@ class Profile(models.Model):
     website = models.URLField(verbose_name='Веб-сайт', blank=True)
     phone = models.CharField(verbose_name='Телефон', max_length=15, blank=True)
     
+    followers = models.ManyToManyField(User, related_name='following', blank=True)
+
+    def follow(self, user):
+        self.followers.add(user)
+
+    def unfollow(self, user):
+        self.followers.remove(user)
+
+    def is_following(self, user):
+        return user in self.followers.all()
+
+    def get_followers(self):
+        return self.followers.all()
+    #fIX ME
+    def get_following(self):
+        return User.objects.filter(following__user=self.user)
+    
     def get_avatar(self):
         if self.avatar:
             return self.avatar_thumbnail.url

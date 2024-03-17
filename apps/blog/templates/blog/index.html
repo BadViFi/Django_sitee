@@ -57,115 +57,44 @@
 
 
 <!-- Modal -->
-<div class="modal modal-xl fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Створити пост</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Створити пост</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="{% url 'blog:create' %}" method="post" enctype="multipart/form-data">
+
+            <div class="modal-body">
+                {% csrf_token %}
+                {{ create_form }}
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Створити</button>
+                
+            </div>
+        </form>
       </div>
-      <!-- <form action="{% url 'blog:create' %}" method="post" enctype="multipart/form-data" id="create_form"> -->
-
-          
-
-          <div class="modal-body">
-            <form id="postForm" method="post" enctype="multipart/form-data">
-              {% csrf_token %}
-              {{ create_form.as_p }}
-              <img id="cropperImage" src="#" alt="Обрізане зображення" style="max-height: 200px">
-              <button type="submit" class="btn btn-primary">Відправити</button>
-          </form>
-              <!-- {% csrf_token %}
-              {{ create_form }} -->
-          </div>
-          <!-- <div class="modal-footer">
-              <button type="submit" class="btn btn-primary" id="btn_create">Створити</button>
-              
-          </div> -->
-      </form>
     </div>
   </div>
-</div>
 
-<script>
-  
-  function like(post_id){
-      fetch('{% url "blog:like" 0 %}'.replace('0', post_id))
-      .then(response => response.json())
-      .then(data => {
-          document.getElementById('btn_like_' + post_id).innerText = `👍 ${data.likes}`;
-      })
-  }
+  <script>
+    
+    function like(post_id){
+        fetch('{% url "blog:like" 0 %}'.replace('0', post_id))
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('btn_like_' + post_id).innerText = `👍 ${data.likes}`;
+        })
+    }
 
-  {% for post in posts %}
-      document.getElementById('btn_like_{{post.id}}').addEventListener('click', function(){
-          like({{post.id}});
-      });
-  {% endfor %}
-
-
-  var cropper;
-  document.getElementById('imageInput').addEventListener('change', function(event) {
-    var input = event.target;
-    var reader = new FileReader();
-
-    reader.onload = function() {
-        var image = document.getElementById('cropperImage');
-        image.src = reader.result;
-        
-        // Після того як зображення завантажиться, створіть екземпляр Cropper
-        image.onload = function() {
-            cropper = new Cropper(image, {
-                aspectRatio: 16 / 9,
-                viewMode: 1,
-              cropBoxMovable: true,
-              cropBoxResizable: true,
-              // Встановлюємо інші опції в false
-              movable: false,
-              zoomable: false,
-              rotatable: false,
-              scalable: false,
-              autoCrop: true,
-                crop: function(event) {
-                    // Поточна область обрізки доступна в event.detail
-                    
-                }
-            });
-        };
-    };
-
-    // Зчитування вибраного файлу як URL-адреси даних
-    reader.readAsDataURL(input.files[0]);
-});
-
-    var form = document.getElementById('postForm');
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
-        
-        cropper.getCroppedCanvas().toBlob(function(blob) {
-            var formData = new FormData(form);
-            formData.append('image', blob, 'cropped_image.jpg');
-            
-            fetch('{% url "blog:create" %}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            }).then(response => {
-                // перезавантажити сторінку після успішної відправки форми
-                if (response.ok) {
-                    location.reload();
-                }
-            }).catch(error => {
-                console.error('Помилка під час відправлення форми:', error);
-            });
-        }, 'image/jpeg');
-    });
-
-
+    {% for post in posts %}
+        document.getElementById('btn_like_{{post.id}}').addEventListener('click', function(){
+            like({{post.id}});
+        });
+    {% endfor %}
 </script>
-
 
 <script>
     
@@ -183,10 +112,9 @@
       });
   {% endfor %}
 </script>
-
+  
 
 {% endblock %}
-
 
 
 
