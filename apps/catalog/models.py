@@ -43,20 +43,20 @@ class Catalog(MPTTModel):
     def get_absolute_url(self):
         return reverse("catalog:category", kwargs={"slug": self.slug})
     
-    # def image_tag_thumbnail(self):
-    #     if self.image:
-    #         return mark_safe(f'<img src="{self.image.url}" height="70" />')
+    def image_tag_thumbnail(self):
+        if self.image:
+            return mark_safe(f'<img src="{self.image.url}" height="70" />')
         
-    # image_tag_thumbnail.short_description = 'Зображення'
-    # image_tag_thumbnail.allow_tags = True
+    image_tag_thumbnail.short_description = 'Зображення'
+    image_tag_thumbnail.allow_tags = True
     
-    # def image_tag(self):
-    #     if self.image:
-    #         return mark_safe(f'<img src="{self.image.url}" />')
-    # image_tag.short_description = 'Зображення'
-    # image_tag.allow_tags = True
+    def image_tag(self):
+        if self.image:
+            return mark_safe(f'<img src="{self.image.url}" />')
+    image_tag.short_description = 'Зображення'
+    image_tag.allow_tags = True
     
-    # class Meta:
-    #     verbose_name = 'Категорія'
-    #     verbose_name_plural = 'Категорії'
-    #     ordering = ['name']
+    class Meta:
+        verbose_name = 'Категорія'
+        verbose_name_plural = 'Категорії'
+        ordering = ['name']
