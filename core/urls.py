@@ -28,5 +28,6 @@ urlpatterns = [
     path('',include('apps.main.urls')),
     path('members/', include('apps.members.urls')),
     path('article/',include('apps.blog.urls')),
+    path('catalog/', include('apps.catalog.urls')), 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
