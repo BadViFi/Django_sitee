@@ -24,12 +24,13 @@
           </li>
 
 
+
         </ul>
-        <!-- <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <form class="d-flex" role="search" method="get" action="{% url 'blog:index' %}">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
           <button class="btn btn-success" type="submit">Search</button>
-        </form> -->
-        <div class="d-flex gap-2">
+        </form>
+        <div class="d-flex gap-2 ms-3">
           {% if user.is_authenticated %}
           <div class="dropdown text-end">
             <a href="" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -49,4 +50,3 @@
       </div>
     </div>
   </nav>
-

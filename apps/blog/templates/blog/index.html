@@ -10,49 +10,54 @@
         <div class="mt-3 rounded-3 bg-body-tertiary p-4">
             <h3>Блог</h3>
             <!-- Button trigger modal -->
+            {% if user.is_authenticated %}
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                Створити пост
             </button>
+            {% endif %}
             <hr class="my-4">
             {% include 'blog/_include_blocks/_posts_show.html' with posts=posts edit=False %}
 
             <nav aria-label="Page navigation example" class="mt-4 align-items-center d-flex justify-content-center">
-                <ul class="pagination">
-                    {% if posts.has_previous %}
-                  <li class="page-item">
-                    
-                    <a class="page-link" href="?page=1" aria-label="Previous">
-                      <span aria-hidden="true">&laquo;</span>
-                      <span class="sr-only">Previous</span>
-                    </a>
-                    
-                   
-                    <li class="page-item">
-                  <a class="page-link" href="?page={{ posts.previous_page_number }}" aria-label="1">
-                    <span aria-hidden="true">&laquo;</span>
-                    <span class="sr-only">1</span>
-                  </a>
-                </li>
+              <ul class="pagination">
+                  {% if posts.has_previous %}
+                      <li class="page-item">
+                          <a class="page-link" href="?page=1" aria-label="First">
+                              <span aria-hidden="true">&laquo;</span>
+                              <span class="sr-only">1</span>
+                          </a>
+                      </li>
+                      <li class="page-item">
+                          <a class="page-link" href="?page={{ posts.previous_page_number }}" aria-label="Previous">
+                              <span aria-hidden="true">{{ posts.previous_page_number }}</span>
+                              <span class="sr-only">{{ posts.previous_page_number }}</span>
+                          </a>
+                      </li>
+
                   {% endif %}
-                  {% for num in posts.paginator.page_range %}
-                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-                  {% endfor %}
-                    {% if posts.has_next %}
-                  <li class="page-item">
-                    <a class="page-link" href="?page={{ posts.next_page_number }}" aria-label="Next">
-                      <span aria-hidden="true">&raquo;</span>
-                      <span class="sr-only">Next</span>
-                    </a>
+                  
+                  
+                  <li class="page-item active" aria-current="page">
+                    <a class="page-link">{{ posts.number}}</a>
                   </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ posts.paginator.num_pages }}" aria-label="Last">
-                        <span aria-hidden="true">&raquo;</span>
-                        <span class="sr-only">Last</span>
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-              </nav>
+                 
+                  
+                  {% if posts.has_next %}
+                      <li class="page-item">
+                          <a class="page-link" href="?page={{ posts.next_page_number }}" aria-label="Next">
+                              <span aria-hidden="true">{{ posts.next_page_number }}</span>
+                              <span class="sr-only">{{ posts.next_page_number }}</span>
+                          </a>
+                      </li>
+                      <li class="page-item">
+                          <a class="page-link" href="?page={{ posts.paginator.num_pages }}" aria-label="Last">
+                              <span aria-hidden="true">&raquo;</span>
+                              <span class="sr-only">Last</span>
+                          </a>
+                      </li>
+                  {% endif %}
+              </ul>
+          </nav>
         </div>
 
 
@@ -102,9 +107,8 @@
             like({{post.id}});
         });
     {% endfor %}
-
-    
-
+  
+  {% if user.is_authenticated %}
     var cropper;
     document.getElementById('imageInput').addEventListener('change', function(event) {
       var input = event.target;
@@ -142,7 +146,7 @@
       var form = document.getElementById('postForm');
       form.addEventListener('submit', function(event) {
           event.preventDefault();
-          
+          this.querySelector('button').disabled = true;
           cropper.getCroppedCanvas().toBlob(function(blob) {
               var formData = new FormData(form);
               formData.append('image', blob, 'cropped_image.jpg');
@@ -164,27 +168,9 @@
           }, 'image/jpeg');
       });
 
-
+{% endif %}
 </script>
-  
 
-{% comment %} {% endblock %} {% endcomment %}
- {% comment %} <script>
-    
-    function like(post_id){
-        fetch('{% url "blog:like" 0 %}'.replace('0', post_id))
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('btn_like_' + post_id).innerText = `👍 ${data.likes}`;
-        })
-    }
-
-    {% for post in posts %}
-        document.getElementById('btn_like_{{post.id}}').addEventListener('click', function(){
-            like({{post.id}});
-        });
-    {% endfor %}
-</script> {% endcomment %}
 
 <script>
     
@@ -201,6 +187,8 @@
             dis_like({{post.id}});
         });
     {% endfor %}
+
+
 </script>
   
 

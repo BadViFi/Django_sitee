@@ -27,7 +27,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Ви увійшли як {username}')
-                return redirect('members:profile')
+                return redirect('members:profile', username=username)
     else:
         form = AuthenticationForm()
     return render(request, 'members/login.html', {'form': form})
@@ -53,7 +53,7 @@ def signup_view(request):
             Profile.objects.create(user=user)
             login(request, user)
             messages.success(request, f'Ви успішно зареєструвалися як {user.username}')
-            return redirect('members:profile')
+            return redirect('members:profile', username=user.username)
     else:
         form = UserCreateForm()
     return render(request, 'members/signup.html', {'form': form})
@@ -63,7 +63,7 @@ def signup_view(request):
 @login_required
 def profile_view(request, username=None):
     if username is None:
-        username = request.user.username
+        username = request.user
     if request.user.username == username:
         uuser = request.user
         post_count = Post.objects.filter(author=uuser, is_published=True).count()

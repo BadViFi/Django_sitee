@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% block title %}Профіль{% endblock %}
 
 
@@ -11,10 +10,10 @@
   <h3 class="text-center">Профіль</h3>
   <hr class="my-4">  
     <div class="row g-4">
-      <div class="col-12 col-md-4">
-        <img src="{{profile.get_avatar}}" class="img-fluid rounded-circle mx-auto d-block" alt="...">
-        {% if not another_user %}         
-        <div class="d-flex justify-content-center mt-2">
+        <div class="col-12 col-md-4">
+          <img src="{{profile.get_avatar}}" class="img-fluid rounded-circle mx-auto d-block" alt="...">
+          {% if not another_user %}         
+          <div class="d-flex justify-content-center mt-2">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
               Редагувати профіль
             </button>
@@ -46,20 +45,18 @@
           <hr class="my-4">
           <h3 class="text-center">Підписки</h3>
           <div class="row g-4">
-            {% for follower in profile.get_followers %}
-            <div class="col-12 col-md-4">
-              <div class="card">
-                <img src="{{follower.profile.get_avatar}}" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title
-                  ">{{ follower.username }}</h5>
-                  <p class="card-text">{{ follower.profile.bio }}</p>
-                  <a href="{% url 'members:profile' follower.username %}" class="btn btn-primary">Переглянути профіль</a>
-                  
-                </div>
-              </div>
+            <ul class="list-unstyled">
+              {% for follower in profile.get_followers %}
+              <li><div class="d-flex align-items-left">
+                <img src="{{follower.profile.get_avatar}}" class="rounded-circle" alt="..." style="width: 30px; height: 30px;">
+                <a href="{% url 'members:profile' follower.username %}" class="text-decoration-none text-primary hover-underline">
+                    <small class="ms-3">@{{ follower.username }}</small>
+                </a>
             </div>
-            {% endfor %}  
+          </li>
+              {% endfor %}  
+            </ul>
+           
           </div>
         </div>
         {% endif %}
@@ -68,20 +65,17 @@
           <hr class="my-4">
           <h3 class="text-center">Підписники</h3>
           <div class="row g-4">
+            <ul class="list-unstyled">
             {% for follower in profile.get_following %}
-            <div class="col-12 col-md-4">
-              <div class="card">
-                <img src="{{follower.profile.get_avatar}}" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title
-                  ">{{ follower.username }}</h5>
-                  <p class="card-text">{{ follower.profile.bio }}</p>
-                  <a href="{% url 'members:profile' follower.username %}" class="btn btn-primary">Переглянути профіль</a>
-                  
-                </div>
-              </div>
-            </div>
+            <li><div class="d-flex align-items-left">
+              <img src="{{follower.get_avatar}}" class="rounded-circle" alt="..." style="width: 30px; height: 30px;">
+              <a href="{% url 'members:profile' follower.user.username %}" class="text-decoration-none text-primary hover-underline">
+                  <small class="ms-3">@{{ follower.user.username }}</small>
+              </a>
+          </div>
+        </li>
             {% endfor %}  
+          </ul>
           </div>
         </div>
         {% endif %}
@@ -89,43 +83,45 @@
 </div>
 
 <div class="mt-4 rounded-3 bg-body-tertiary p-4">
-        <h3 class="text-center">Пости</h3>
-        <center>
-          <h5>Кількість постів: {{counter}} </h5>
-        </center>
-        {% if not another_user %}
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Створити пост
-             </button>
-        <hr class="my-4">
-        {% include 'blog/_include_blocks/_posts_show.html' with posts=user_profile.posts.all edit=True %}
-        {% else %}
-        <hr class="my-4">
-        {% include 'blog/_include_blocks/_posts_show.html' with posts=user_profile.posts.all edit=False %}
-        {% endif %} 
-    </div>
+  <h3 class="text-center">Пости</h3>
+  <center>
+    <h5>Кількість постів: {{counter}} </h5>
+  </center>
+
+  {% if not another_user %}
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          Створити пост
+       </button>
+  <hr class="my-4">
+  {% include 'blog/_include_blocks/_posts_show.html' with posts=user_profile.posts.all edit=True %}
+  {% else %}
+  <hr class="my-4">
+  {% include 'blog/_include_blocks/_posts_show.html' with posts=user_profile.posts.all edit=False %}
+  {% endif %} 
+</div>
 
 
-{% if not another_user %}
+    {% if not another_user %}
 
-      <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="editProfileModalLabel">Редагувати профіль</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form action="{% url 'members:profile_update' %}" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ user_form}}
-                {{ profile_form }}
-                <button type="submit" class="btn btn-primary mt-4">Зберегти</button>
-              </form>
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="editProfileModalLabel">Редагувати профіль</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
+          <div class="modal-body">
+            <form action="{% url 'members:profile_update' %}" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ user_form}}
+              {{ profile_form }}
+              <button type="submit" class="btn btn-primary mt-4">Зберегти</button>
+            </form>
         </div>
       </div>
+    </div>
 {% endif %}
+
 
 
 

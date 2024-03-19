@@ -6,16 +6,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 #Paginator
 from django.core.paginator import Paginator
-
-
-
-
+#Search Q
+from django.db.models import Q
 
 # Create your views here.
 # @login_required
 def index(request):
-    
-    posts = Post.objects.filter(is_published=True)
+    query = request.GET.get('q')
+    if query:
+        posts = Post.objects.filter(Q(title__icontains=query) | Q(content__icontains=query), is_published=True)
+    else:
+        posts = Post.objects.filter(is_published=True)
     create_form = PostForm()
     
     paginator = Paginator(posts, 3)
@@ -53,8 +54,8 @@ def create(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            messages.success(request, 'Пост створено')
     return redirect('blog:index')
+
 
 @login_required
 def comment(request, post_id):
@@ -97,14 +98,12 @@ def like_comment(request, post_id, comment_id):
     comment.save()
     return JsonResponse({'likes': comment.likes.count()})
 
-
 @login_required
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id, author=request.user)
     post.delete()
     messages.success(request, 'Пост видалено')
-    return redirect('members:profile')
-
+    return redirect('members:profile', username=request.user)
 
 @login_required
 def edit_post(request, post_id):
@@ -119,3 +118,8 @@ def edit_post(request, post_id):
     else:
         form = PostForm(instance=post)
     return render(request, 'blog/edit_post.html', {'form': form, 'post': post})
+
+
+# def search(request):
+#     query = request.GET.get('q')
+
