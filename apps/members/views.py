@@ -65,8 +65,8 @@ def profile_view(request, username=None):
     if username is None:
         username = request.user
     if request.user.username == username:
-        uuser = request.user
-        post_count = Post.objects.filter(author=uuser, is_published=True).count()
+        user = request.user
+        post_count = Post.objects.filter(author=user, is_published=True).count()
         form_create_post = PostForm()
         user_form = UserUpdateForm(instance=request.user)
         profile_form = ProfileUpdateForm(instance=request.user.profile)
@@ -82,15 +82,15 @@ def profile_view(request, username=None):
     else:
         user = get_object_or_404(User, username=username)
         profile = get_object_or_404(Profile, user=user)
+        post_count = Post.objects.filter(author=user, is_published=True).count()
         context = {
             'another_user': True,
             'user_profile': user,
             'profile': profile,
             'is_following': request.user.profile.is_following(user),
+            'counter': post_count
         }
     return render(request, 'members/profile.html', context)
-
-
 
 @login_required
 def profile_update_view(request):
@@ -114,7 +114,7 @@ def search_view(request):
         query = request.GET.get('q')
         if query:
             users = User.objects.filter(username__icontains=query)
-            return render(request, 'members/search.html', {'users': users})
+            return render(request, 'members/search.html',{'users': users})
     return render(request, 'members/search.html', {'users': None})
 
 
