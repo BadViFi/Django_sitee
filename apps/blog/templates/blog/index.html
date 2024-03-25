@@ -8,12 +8,17 @@
     
 
         <div class="mt-3 rounded-3 bg-body-tertiary p-4">
+
             <h3>Блог</h3>
+            
             <!-- Button trigger modal -->
+
             {% if user.is_authenticated %}
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                Створити пост
             </button>
+
+
             {% endif %}
             <hr class="my-4">
             {% include 'blog/_include_blocks/_posts_show.html' with posts=posts edit=False %}

@@ -103,7 +103,7 @@ def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id, author=request.user)
     post.delete()
     messages.success(request, 'Пост видалено')
-    return redirect('members:profile', username=request.user)
+    return redirect('members:profile', username=request.user.username)
 
 @login_required
 def edit_post(request, post_id):
