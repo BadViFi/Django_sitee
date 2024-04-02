@@ -20,34 +20,22 @@
       {% include 'include_block/_main_navbar.html' %}
 
       <div class="container">
+        {% block breadcrumbs %}
+        {% include 'include_block/_breadcrumbs.html' %}
+      {% endblock %}
 
-        <nav aria-label="breadcrumb" class="mt-3">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-              <a href="#"><i class="fas fa-home me-1"></i>Home</a>
-            </li>
-            <li class="breadcrumb-item">
-              <a href="#">Library</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">
-              <a href="#">Data</a>
-            </li>
-          </ol>
-        </nav>
-      
-      
-      
-      <div class="container">
-        {% if messages %}
-          {% for message in messages %}
-            <div class="mt-3 alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          {% endfor %}
-        {% endif %}
-          {% block content %}{% endblock %}
-      </div>
+      {% if messages %}
+        {% for message in messages %}
+
+          <div class="mt-3 alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+        {% block content %}{% endblock %}
+</div>
+
   
   
   

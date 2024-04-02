@@ -13,6 +13,8 @@ urlpatterns = [
     path('profile/<str:username>', profile_view, name='profile'),
     path('profile/<str:username>/follow/', follow_view, name='follow'),
     
+    path('profile/<str:username>/privacy/', privacy_view, name='privacy'),
+    
     path('search/', search_view, name='search_profile'),
     
     ] 
