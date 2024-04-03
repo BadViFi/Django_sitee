@@ -2,19 +2,14 @@
 
 {% block title %}Профіль{% endblock %}
 
-
-
 {% block content %}
 
 <div class="mt-4 rounded-3 bg-body-tertiary p-4">
-
 
     <div class="row g-4">
         <div class="col-12 col-md-4">
           <img src="{{profile.get_avatar}}" class="img-fluid rounded-circle mx-auto d-block" alt="...">
           {% if another_user %}         
-
-
 
           <div class="d-flex justify-content-center mt-2">
             {% if not is_following %}
@@ -78,7 +73,10 @@
             </div>
             {% endif %}
           </div>
-        {% if profile.get_following %}
+          {% endif %}
+        </div>
+      </div>
+      {% if profile.get_following %}
         <div class="col-12">
           <hr class="my-4">
           <h3 class="text-center">Підписники</h3>
@@ -96,8 +94,7 @@
           </ul>
           </div>
         </div>
-        {% endif %}
-    </div>
+      {% endif %}
 </div>
 
 {% if not profile.is_private or not another_user  %}
@@ -120,8 +117,7 @@
 </div>
 {% endif %}
 
-    {% if not another_user %}
-
+{% if not another_user %}
     <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -140,9 +136,6 @@
       </div>
     </div>
 {% endif %}
-
-
-
 
 <script>
     
@@ -181,7 +174,3 @@
 </script>
 
 {% endblock %}
-
-
-
-

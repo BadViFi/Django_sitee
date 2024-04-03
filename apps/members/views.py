@@ -63,17 +63,15 @@ def signup_view(request):
     return render(request, 'members/signup.html', {'form': form})
 
 
-
 @login_required
 def profile_view(request, username=None):
     if username is None:
         username = request.user
     if request.user.username == username:
-        user = request.user
-        post_count = Post.objects.filter(author=user, is_published=True).count()
         form_create_post = PostForm()
         user_form = UserUpdateForm(instance=request.user)
         profile_form = ProfileUpdateForm(instance=request.user.profile)
+        post_count = Post.objects.filter(author=request.user, is_published=True).count()
         context = {
             'form_create_post': form_create_post,
             'user_form': user_form,
@@ -81,20 +79,56 @@ def profile_view(request, username=None):
             'user_profile': request.user,
             'profile': request.user.profile,
             'another_user': False,
-            'counter': post_count,
+            'counter':post_count
         }
     else:
         user = get_object_or_404(User, username=username)
         profile = get_object_or_404(Profile, user=user)
-        post_count = Post.objects.filter(author=user, is_published=True).count()
         context = {
             'another_user': True,
             'user_profile': user,
             'profile': profile,
             'is_following': request.user.profile.is_following(user),
-            'counter': post_count
+            'counter':post_count
         }
-    return redirect('members:profile', username=request.user.username)
+    return render(request, 'members/profile.html', context)
+
+
+
+
+
+
+# @login_required
+# def profile_view(request, username=None):
+#     if username is None:
+#         username = request.user
+#     if request.user.username == username:
+#         user = request.user
+#         post_count = Post.objects.filter(author=user, is_published=True).count()
+#         form_create_post = PostForm()
+#         user_form = UserUpdateForm(instance=request.user)
+#         profile_form = ProfileUpdateForm(instance=request.user.profile)
+#         context = {
+#             'form_create_post': form_create_post,
+#             'user_form': user_form,
+#             'profile_form': profile_form,
+#             'user_profile': request.user,
+#             'profile': request.user.profile,
+#             'another_user': False,
+#             'counter': post_count,
+#         }
+#     else:
+#         user = get_object_or_404(User, username=username)
+#         profile = get_object_or_404(Profile, user=user)
+#         post_count = Post.objects.filter(author=user, is_published=True).count()
+#         context = {
+#             'another_user': True,
+#             'user_profile': user,
+#             'profile': profile,
+#             'is_following': request.user.profile.is_following(user),
+#             'counter': post_count
+#         }
+#     return redirect('members:profile', username=request.user.username)
 
 @login_required
 def profile_update_view(request):
