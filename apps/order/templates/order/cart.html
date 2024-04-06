@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Каталог{% endblock %}
+
+
+
+{% block content %}
+
+   <!-- Таблиця карзина -->
+    <div class="container mt-3">
+     <h3>Корзина</h3>
+     <table class="table">
+          <thead>
+                <tr>
+                 <th scope="col">№</th>
+                 <th scope="col">Назва</th>
+                 <th scope="col">Ціна</th>
+                 <th scope="col">Кількість</th>
+                 <th scope="col">Сума</th>
+                 <th scope="col">Дія</th>
+                </tr>
+          </thead>
+          <tbody>
+                {% for item in cart %}
+                <tr>
+                 <th scope="row">{{ forloop.counter }}</th>
+                 <td>{{ item.product.name }}</td>
+                 <td>{{ item.product.price }}</td>
+                 <td>{{ item.quantity }}</td>
+                 <td>{{ item.total_price }}</td>
+                 <td>
+                      <a href="" class="btn btn-danger btn-sm">Видалити</a>
+                 </td>
+                </tr>
+                {% endfor %}
+                <tr>
+                 <td colspan="4">Всього</td>
+                 <td>{{ total_price }}</td>
+                 <td>
+                      <a href="" class="btn btn-danger btn-sm">Очистити</a>
+                 </td>
+                </tr>
+          </tbody>
+     </table>
+     <a href="" class="btn btn-primary">Оформити замовлення</a>
+
+    </div>
+
+{% endblock %}

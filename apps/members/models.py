@@ -20,6 +20,7 @@ class Profile(models.Model):
     location = models.CharField(verbose_name='Місце проживання', max_length=255, blank=True)
     website = models.URLField(verbose_name='Веб-сайт', blank=True)
     phone = models.CharField(verbose_name='Телефон', max_length=15, blank=True)
+    is_private = models.BooleanField(verbose_name='Приватний профіль', default=False)
     
     followers = models.ManyToManyField(User, related_name='following', blank=True)
 
@@ -34,8 +35,6 @@ class Profile(models.Model):
 
     def get_followers(self):
         return self.followers.all()
-    #fIX ME 
-    # #Ця функція повертає всіх користувачів, які підписані на даного користувача
     def get_following(self):
         print(Profile.objects.filter(followers=self.user))
         return Profile.objects.filter(followers__in=[self.user])

@@ -52,12 +52,14 @@ INSTALLED_APPS = [
     'ckeditor',
     'imagekit',
     "debug_toolbar",
+    'django_filters',
 
      
     'apps.main',
     'apps.blog',
     'apps.members',
     'apps.catalog',
+    'apps.order',
 ]
 
 MIDDLEWARE = [
