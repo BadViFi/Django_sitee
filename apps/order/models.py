@@ -14,6 +14,9 @@ class Cart(models.Model):
         verbose_name = 'Кошик'
         verbose_name_plural = 'Кошики'
         # unique_together = ('user', 'product' ) # Щоб не можна було додати один і той же товар в корзину більше одного разу
+    
+    def total_price(self):
+        return self.product.price * self.quantity
 
 
 class Favorite(models.Model):

@@ -34,6 +34,8 @@
         </form>
         <div class="d-flex gap-2 ms-3">
           {% if user.is_authenticated %}
+          <!-- Карзина -->
+          <a class="btn btn-outline-primary btn-sm" href="{% url 'order:cart' %}"><i class="fa-solid fa-shopping-cart"></i>Корзина</a>
           <div class="dropdown text-end">
             <a href="" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
               <img src="{{user.profile.get_avatar}}" alt="mdo" width="32" height="32" class="rounded-circle">
