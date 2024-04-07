@@ -8,7 +8,12 @@ from apps.main.mixins import ListViewBreadcrumbMixin, DetailViewBreadcrumbMixin
 from .filters import ProductFilter
 
 
+
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+
 # Create your views here.
+
 
 class CataloglistView(ListViewBreadcrumbMixin):
     model = Catalog
@@ -31,7 +36,7 @@ class CataloglistView(ListViewBreadcrumbMixin):
         # print(context)
         return context
     
-
+@method_decorator(cache_page(60 * 1), name='get')
 class ProductByCategoryView(ListViewBreadcrumbMixin):
     model = Catalog
     template_name = 'catalog/product_by_category.html'
