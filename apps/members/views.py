@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
@@ -147,3 +147,16 @@ def privacy_view(request, username):
         profile.save()
         messages.success(request, 'Ваші налаштування приватності успішно змінені')
     return redirect('members:profile', username=username)
+
+
+@login_required
+def password_change_view(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Ваш пароль успішно змінено')
+            return redirect('members:profile', username=request.user.username)
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'members/change_password.html', {'form': form})
