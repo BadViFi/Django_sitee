@@ -65,6 +65,7 @@ def signup_view(request):
 
 @login_required
 def profile_view(request, username=None):
+    post_count = 0
     if username is None:
         username = request.user
     if request.user.username == username:
@@ -83,6 +84,7 @@ def profile_view(request, username=None):
         }
     else:
         user = get_object_or_404(User, username=username)
+        post_count = Post.objects.filter(author=user, is_published=True).count()
         profile = get_object_or_404(Profile, user=user)
         context = {
             'another_user': True,
