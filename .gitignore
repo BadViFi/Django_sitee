@@ -2,3 +2,6 @@
 __pycache__
 db.sqlite3
 media
+.env
+last_prjct
+users.json
