@@ -25,6 +25,7 @@ app_name = 'blog'
 
 urlpatterns = [
     path("__debug__/", include("debug_toolbar.urls")),
+    path('captcha/', include('captcha.urls')),
     path('admin/', admin.site.urls),
     path('', include('apps.main.urls')),
     path('members/', include('apps.members.urls')),

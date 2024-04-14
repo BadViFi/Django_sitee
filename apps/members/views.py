@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
@@ -15,8 +15,10 @@ from apps.blog.models import Post
 from .forms import UserCreateForm, ProfileUpdateForm , UserUpdateForm
 from apps.blog.forms import PostForm
 from .models import Profile
-# Create your views here.
 
+from apps.order.models import Order
+
+# Create your views here.
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
@@ -28,7 +30,6 @@ def login_view(request):
                 login(request, user)
                 messages.success(request, f'Ви увійшли як {username}')
                 return redirect('members:profile', username=username)
-            
         # else:
         #     messages.add_message(request, messages.ERROR, 'Неправильний логін або пароль', extra_tags='danger')
     else:
@@ -65,12 +66,14 @@ def signup_view(request):
 
 @login_required
 def profile_view(request, username=None):
+    post_count = 0
     if username is None:
         username = request.user
     if request.user.username == username:
         form_create_post = PostForm()
         user_form = UserUpdateForm(instance=request.user)
         profile_form = ProfileUpdateForm(instance=request.user.profile)
+        orders = Order.objects.filter(user=request.user).prefetch_related('orderproduct_set').prefetch_related('orderproduct_set__product').prefetch_related('orderproduct_set__product__images').order_by('created_at')
         post_count = Post.objects.filter(author=request.user, is_published=True).count()
         context = {
             'form_create_post': form_create_post,
@@ -79,10 +82,12 @@ def profile_view(request, username=None):
             'user_profile': request.user,
             'profile': request.user.profile,
             'another_user': False,
-            'counter':post_count
+            'counter':post_count,
+            'orders': orders,
         }
     else:
         user = get_object_or_404(User, username=username)
+        post_count = Post.objects.filter(author=user, is_published=True).count()
         profile = get_object_or_404(Profile, user=user)
         context = {
             'another_user': True,
@@ -147,3 +152,16 @@ def privacy_view(request, username):
         profile.save()
         messages.success(request, 'Ваші налаштування приватності успішно змінені')
     return redirect('members:profile', username=username)
+
+
+@login_required
+def password_change_view(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Ваш пароль успішно змінено')
+            return redirect('members:profile', username=request.user.username)
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'members/change_password.html', {'form': form})

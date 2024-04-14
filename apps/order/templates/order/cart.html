@@ -2,10 +2,7 @@
 
 {% block title %}Каталог{% endblock %}
 
-
-
 {% block content %}
-
    <!-- Таблиця карзина -->
     <div class="container mt-3">
      <h3>Корзина</h3>
@@ -14,6 +11,7 @@
                 <tr>
                  <th scope="col">№</th>
                  <th scope="col">Назва</th>
+                 <th scope="col">Зображення</th>
                  <th scope="col">Ціна</th>
                  <th scope="col">Кількість</th>
                  <th scope="col">Сума</th>
@@ -24,26 +22,30 @@
                 {% for item in cart %}
                 <tr>
                  <th scope="row">{{ forloop.counter }}</th>
-                 <td>{{ item.product.name }}</td>
+                 <td><a href="{{item.product.get_absolute_url}}">{{ item.product.name }}</a></td>
+                 <td><img src='{{ item.product.main_image.image_thumbnail.url }}' alt='{{ item.product.name }}' style="max-width: 100px; max-height: 100px;"></td>
                  <td>{{ item.product.price }}</td>
-                 <td>{{ item.quantity }}</td>
+                 <td class="align-middle"> <!-- Устанавливаем вертикальное выравнивание посередине -->
+                    <form method="post" class="mx-2" action="{% url 'order:cart_item_update' cart_id=item.id  action='update' %}">
+                      {% csrf_token %}
+                      <input type="number" name="quantity" value="{{ item.quantity }}" class="form-control" style="width: 100px;" onchange="this.form.submit()">
+                    </form>
+               </td>
                  <td>{{ item.total_price }}</td>
                  <td>
-                      <a href="" class="btn btn-danger btn-sm">Видалити</a>
+                      <a href="{% url 'order:cart_remove' item.id %}" class="btn btn-danger btn-sm">Видалити</a>
                  </td>
                 </tr>
                 {% endfor %}
                 <tr>
-                 <td colspan="4">Всього</td>
+                 <td colspan="5">Всього</td>
                  <td>{{ total_price }}</td>
                  <td>
-                      <a href="" class="btn btn-danger btn-sm">Очистити</a>
+                      <a href="{% url 'order:cart_clear' %}" class="btn btn-danger btn-sm">Очистити</a>
                  </td>
                 </tr>
           </tbody>
      </table>
-     <a href="" class="btn btn-primary">Оформити замовлення</a>
-
+     <a href="{% url 'order:cart_ordering' %}" class="btn btn-success">Оформити замовлення</a>
     </div>
-
 {% endblock %}

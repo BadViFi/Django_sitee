@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Каталог{% endblock %}
+
+
+
+{% block content %}
+
+   <!-- Таблиця карзина -->
+    <div class="container mt-3">
+        <h3>Дякуємо за замовлення!</h3>
+        <p>Ваше замовлення успішно оформлено. Наш менеджер зв'яжеться з вами найближчим часом.</p>
+        <p class="text-muted">Номер вашого замовлення: {{ order.id }}</p>
+        <p class="text-muted">Сума замовлення: {{ order.total_price }}</p>
+        <a href="{% url 'members:profile' user.username %}" class="btn btn-primary">Перейти в особистий кабінет</a>
+    </div>
+
+{% endblock %}

@@ -9,6 +9,9 @@ from django.core.paginator import Paginator
 #Search Q
 from django.db.models import Q
 
+
+from django.views.decorators.cache import cache_page
+
 # Create your views here.
 # @login_required
 def index(request):

@@ -8,7 +8,12 @@ from apps.main.mixins import ListViewBreadcrumbMixin, DetailViewBreadcrumbMixin
 from .filters import ProductFilter
 
 
+
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+
 # Create your views here.
+
 
 class CataloglistView(ListViewBreadcrumbMixin):
     model = Catalog
@@ -31,12 +36,14 @@ class CataloglistView(ListViewBreadcrumbMixin):
         # print(context)
         return context
     
-
+    
+@method_decorator(cache_page(60 * 2), name='dispatch')
 class ProductByCategoryView(ListViewBreadcrumbMixin):
     model = Catalog
     template_name = 'catalog/product_by_category.html'
     context_object_name = 'category'
     
+
     def get_queryset(self):
         self.category = Catalog.objects.get(slug=self.kwargs['slug'])
         self.categories = Catalog.objects.filter(parent=self.category).select_related('parent')
@@ -45,15 +52,18 @@ class ProductByCategoryView(ListViewBreadcrumbMixin):
         filter_query = ProductFilter(self.request.GET, queryset=queryset)
         return filter_query
     
-    
-    def count_product(self):
-        return Product.objects.filter( Q(productcategory__category__in=self.all_categories) | Q(productcategory__category=self.category)).count()
+
+    def count_filtered_products(self):
+        queryset = Product.objects.filter( Q(productcategory__category__in=self.all_categories) | Q(productcategory__category=self.category))
+        count_filtered_products = ProductFilter(self.request.GET, queryset=queryset).qs.count()
+        return count_filtered_products
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs) 
         context['categories'] = self.categories
         context['category'] = self.category
-        context['count_product'] = self.count_product()
+        context['count_product'] = self.count_filtered_products()
         return context
     
     def get_breradcrumb(self):
