@@ -35,6 +35,8 @@ class CartView(LoginRequiredMixin, ListViewBreadcrumbMixin):
             'current': 'Кошик',
         }
         return self.breadcrumbs
+
+        
     
 
 class AddToCartView(LoginRequiredMixin, View):
