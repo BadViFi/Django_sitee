@@ -1,6 +1,7 @@
 from django.urls import path
 
-from .views import AddToCartView, CartView, DeleteFromCartView, ClearCartView, CartOrderingView
+from .views import (AddToCartView, CartView, DeleteFromCartView, 
+                    ClearCartView, CartOrderingView, OrderComplete)
 
 app_name = 'order'
 
@@ -12,4 +13,6 @@ urlpatterns = [
     path('cart/clear/', ClearCartView.as_view(), name='cart_clear'),
 
     path('cart/ordering', CartOrderingView.as_view(), name='cart_ordering'),
+    
+    path("complete/<int:order_id>/", OrderComplete.as_view(), name='complete'),
 ]

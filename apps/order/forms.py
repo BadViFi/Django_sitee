@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Cart
+from .models import Cart, Order
 
 
        
@@ -23,3 +23,8 @@ class CartAddProductForm(forms.ModelForm):
             raise forms.ValidationError('На складі недостатньо товару')
         
         return cleaned_data
+    
+class OrderCreateForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ('first_name', 'last_name', 'email', 'phone', 'address', 'comment')
