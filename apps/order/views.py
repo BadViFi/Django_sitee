@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.db import transaction
 
 from apps.main.mixins import ListViewBreadcrumbMixin
-from .forms import CartAddProductForm, OrderCreateForm
+from .forms import CartAddProductForm, OrderCreateForm, CartUpdateForm
 from .models import Cart, OrderProduct, Order
 # Create your views here.
 
@@ -135,4 +135,46 @@ class OrderComplete(LoginRequiredMixin, View):
         return render(request, 'order/order_complete.html', context=context)
 
     def post(self, request):
+        return redirect('order:cart')
+    
+    
+class CartUpdateView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        cart_id = kwargs.get('cart_id')
+        action = kwargs.get('action')
+        cart = get_object_or_404(Cart, pk=cart_id)
+        if action == 'add':
+            cart.quantity += 1
+            cart.save()
+        elif action == 'remove':
+            cart.quantity -= 1
+            if cart.quantity == 0:
+                cart.quantity = 1
+                messages.error(request, f'Кількість товару {cart.product.name} не може бути менше 1')
+            cart.save()
+
+        if cart.quantity > cart.product.quantity:
+                messages.add_message(request, messages.ERROR, f'На складі недостатньо товару {cart.product.name}', extra_tags='danger')
+                cart.quantity = cart.product.quantity
+                cart.save()
+                return redirect('order:cart')
+        messages.success(request, f'Кількість товару {cart.product.name} змінено на {cart.quantity}')
+
+
+        return redirect('order:cart')
+
+    def post(self, request, *args, **kwargs):
+        cart_id = kwargs.get('cart_id')
+        cart = get_object_or_404(Cart, pk=cart_id)
+
+        form = CartUpdateForm(request.POST, instance=cart)
+
+        if form.is_valid():
+            quantity = form.cleaned_data.get('quantity')
+            cart.quantity = quantity
+            cart.save()
+            messages.success(request, f'Кількість товару {cart.product.name} змінено на {quantity}')
+        else:
+            messages.error(request, f'Помилка зміни кількості товару: {[error for error in form.errors.values()][0][0]}', extra_tags='danger')
+
         return redirect('order:cart')

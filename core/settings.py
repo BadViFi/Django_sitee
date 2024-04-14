@@ -53,6 +53,9 @@ INSTALLED_APPS = [
     'imagekit',
     "debug_toolbar",
     'django_filters',
+    'captcha',
+    'crispy_forms',
+    'crispy_bootstrap5',
 
      
     'apps.main',
@@ -187,3 +190,7 @@ CACHES = {
         "LOCATION": "redis://127.0.0.1:6379",
     }
 }
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"

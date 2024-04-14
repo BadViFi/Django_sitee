@@ -14,6 +14,7 @@ class Cart(models.Model):
     class Meta:
         verbose_name = 'Кошик'
         verbose_name_plural = 'Кошики'
+        ordering = ('id',)
         # unique_together = ('user', 'product' ) # Щоб не можна було додати один і той же товар в корзину більше одного разу
     
     def total_price(self):

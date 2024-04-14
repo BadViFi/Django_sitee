@@ -2,6 +2,8 @@
 
 {% block title %}Профіль{% endblock %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
 
 <div class="mt-4 rounded-3 bg-body-tertiary p-4">
@@ -155,8 +157,8 @@
           <div class="modal-body">
             <form action="{% url 'members:profile_update' %}" method="post" enctype="multipart/form-data">
               {% csrf_token %}
-              {{ user_form}}
-              {{ profile_form }}
+              {{ user_form | crispy}}
+              {{ profile_form | crispy }}
               <button type="submit" class="btn btn-primary mt-4">Зберегти</button>
             </form>
         </div>

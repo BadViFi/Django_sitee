@@ -24,12 +24,19 @@
                 {% for item in cart %}
                 <tr>
                  <th scope="row">{{ forloop.counter }}</th>
-                 <td>{{ item.product.name }}</td>
+                 <td><a href="{{item.product.get_absolute_url}}">{{ item.product.name }}</a></td>
                  <td>{{ item.product.price }}</td>
-                 <td>{{ item.quantity }}</td>
+                 <td class="d-flex align-items-center">
+                   <a href="{% url 'order:cart_item_update' cart_id=item.id   action='add' %}" class="btn btn-primary btn-sm">+</a>
+                    <form method="post" class="mx-2" action="{% url 'order:cart_item_update' cart_id=item.id  action='update' %}">
+                      {% csrf_token %}
+                      <input type="number" name="quantity" value="{{ item.quantity }}" class="form-control" style="width: 100px;" onchange="this.form.submit()">
+                    </form>
+                    <a href="{% url 'order:cart_item_update' cart_id=item.id   action='remove' %}" class="btn btn-primary btn-sm">-</a>
+               </td>
                  <td>{{ item.total_price }}</td>
                  <td>
-                    <a href="{% url 'order:cart_remove' item.id %}" class="btn btn-danger btn-sm">Видалити</a>
+                      <a href="{% url 'order:cart_remove' item.id %}" class="btn btn-danger btn-sm">Видалити</a>
                  </td>
                 </tr>
                 {% endfor %}
@@ -37,7 +44,7 @@
                  <td colspan="4">Всього</td>
                  <td>{{ total_price }}</td>
                  <td>
-                    <a href="{% url 'order:cart_clear' %}" class="btn btn-danger btn-sm">Очистити</a>
+                      <a href="{% url 'order:cart_clear' %}" class="btn btn-danger btn-sm">Очистити</a>
                  </td>
                 </tr>
           </tbody>

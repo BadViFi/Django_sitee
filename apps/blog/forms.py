@@ -1,11 +1,12 @@
 import uuid
 
 from django import forms
+from captcha.fields import CaptchaField
 
 from .models import Post, Comment
 
 class PostForm(forms.ModelForm):
-   
+    captcha = CaptchaField()
     class Meta:
         model = Post
         fields = ['title', 'content','is_published', 'image']
@@ -20,7 +21,7 @@ class PostForm(forms.ModelForm):
     
     
 class CommentForm(forms.ModelForm):
-    
+    captcha = CaptchaField()
     class Meta:
         model = Comment
         fields = ['content']

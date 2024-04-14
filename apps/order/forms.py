@@ -28,3 +28,24 @@ class OrderCreateForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ('first_name', 'last_name', 'email', 'phone', 'address', 'comment')
+
+
+class CartUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Cart
+        fields = ('quantity',)
+        widgets = {
+            'quantity': forms.NumberInput(attrs={'class': 'form-control'})
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        product = self.instance.product
+        quantity = cleaned_data.get('quantity')
+
+        if product.quantity < quantity:
+            raise forms.ValidationError('На складі недостатньо товару')
+        elif quantity < 1:
+            raise forms.ValidationError('Кількість товару не може бути менше 1')
+
+        return cleaned_data
