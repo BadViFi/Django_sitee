@@ -8,6 +8,8 @@ from decouple import config
 import django
 import json
 
+
+import threading
 from aiogram import Bot, Dispatcher, types
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup, default_state
@@ -16,6 +18,7 @@ from aiogram.utils.markdown import hbold
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
+from aiogram.utils.markdown import bold
 from asgiref.sync import sync_to_async
 from django.contrib.auth.hashers import make_password, check_password
 
@@ -30,6 +33,7 @@ django.setup()
 
 
 from django.contrib.auth.models import User
+from apps.order.models import Order
 
 
 class RegisterState(StatesGroup):
@@ -77,8 +81,7 @@ async def login(message: types.Message, state: FSMContext):
         'id': message.from_user.username,
         'database_username': user.username,
         'password': make_password(say_password),
-        'user_is_logging': True,
-        'is_main':True,
+        'user_is_logging': True
     }
 
     users = await read_users_from_file()
@@ -124,31 +127,67 @@ async def read_users_from_file():
     
     
    
-   
+@dp.message(Command("logout"))
+async def delete_user_from_file(message: types.Message) -> None:
+    try:
+        
+        users_info = await read_users_from_file()
+
+        updated_users = [user for user in users_info if user['id'] != message.from_user.username]
+
+
+        with open('users.json', 'w') as f:
+            json.dump(updated_users, f, indent=4)
+        
+    except FileNotFoundError:
+        print("Файл не знайдений")
+
     
     
-# def check_user(from_user: types.User):
-#     user_id = from_user.id
-#     for user in users:
-#         if user['id'] == user_id:
-#             return user
-#     return (user_id, from_user.username, from_user.full_name)
 
 
 
-async def check_user(users_info, id):
+async def check_user(id):
+    users_info = await read_users_from_file()
     for user in users_info:
         if user["id"] == id:
             return user
 
-@dp.message(Command("orders"))
-async def orders(message: types.Message):
-    info_about_user = await read_users_from_file()
-    is_user = await check_user(info_about_user, message.from_user.username)
-    if is_user:
-        print(is_user["database_username"])
-    else:
-        print("User not found")
+
+
+
+
+
+
+@dp.message(Command('orders'))
+async def get_user_orders(message: types.Message):
+    try:
+        user = await check_user(message.from_user.username)
+        data_us = user["database_username"]
+        
+        thread = threading.Thread(target=fetch_orders, args=(data_us,))
+        thread.start()
+        
+        await message.answer("Заказы обрабатываются, пожалуйста, подождите.")
+        
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
+
+
+
+
+    
+
+
+def fetch_orders(data_us):
+    orders = Order.objects.filter(user__username=data_us)
+    for order in orders:
+        print(f'Заказ {order.id}:')
+        print(f'Дата создания: {order.created_at}')
+        print(f'Дата обновления: {order.updated_at}')
+        print(f'Общая цена: {order.total_price}')
+        print(f'Статус: {order.get_status_display()}')
+        print('\n')
 
 
 
@@ -157,7 +196,6 @@ async def orders(message: types.Message):
 async def main() -> None:
     bot = Bot(API_TOKEN, parse_mode=ParseMode.HTML)
     await dp.start_polling(bot)
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
