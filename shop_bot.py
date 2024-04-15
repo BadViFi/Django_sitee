@@ -35,6 +35,7 @@ from django.contrib.auth.models import User
 class RegisterState(StatesGroup):
     say_username = State()
     say_password = State()
+    say_tg_username = State()
 
 
 @dp.message(Command("login"))
@@ -61,9 +62,11 @@ async def login(message: types.Message, state: FSMContext):
     say_password = str(message.text)
     data = await state.get_data()
     say_username = data.get('say_username')
+    
 
     queryset = await sync_to_async(User.objects.filter)(username=say_username)
     user = await sync_to_async(queryset.first)()
+    
 
     if not user or not check_password(say_password, user.password):
         await message.answer("такого користувача не знайдено")
@@ -71,25 +74,32 @@ async def login(message: types.Message, state: FSMContext):
         return
 
     user_data = {
-        'telegram_username': message.from_user.username,
+        'id': message.from_user.username,
         'database_username': user.username,
         'password': make_password(say_password),
-        'user_is_logging': True
+        'user_is_logging': True,
+        'is_main':True,
     }
 
-    with open('users.json', 'r') as f:
-        try:
-            users = json.load(f)
-        except json.JSONDecodeError:
-            users = []
+    users = await read_users_from_file()
+    
 
-        existing_user = next((u for u in users if u.get('database_username') == user.username), None)
-        if existing_user and existing_user.get('telegram_username') == message.from_user.username:
-            await message.answer("такий користувач вже знайден")
+
+
+    existing_user = next((u for u in users if u.get('database_username') == user.username), None)
+    if existing_user and existing_user.get('id') == message.from_user.username:
+        await message.answer("такий користувач вже знайден")
+        await state.clear()
+        return
+    
+    for uniq in users:
+        if uniq["id"] == message.from_user.username:
+            await message.answer(f"Користувач з таким юзернеймом в телеграмі вже існує, вам потрібно вийти з аккаунту щоб перейти на інший")
             await state.clear()
             return
 
-        users.append(user_data)
+        
+    users.append(user_data)
 
     with open('users.json', 'w') as f:
         json.dump(users, f, indent=4)
@@ -99,11 +109,49 @@ async def login(message: types.Message, state: FSMContext):
 
 
 
-
-
-
-
     
+        
+
+
+async def read_users_from_file():
+    try:
+        with open('users.json', 'r') as f:
+            users_info = json.load(f)
+            return users_info
+        
+    except FileNotFoundError:
+        return []
+    
+    
+   
+   
+    
+    
+# def check_user(from_user: types.User):
+#     user_id = from_user.id
+#     for user in users:
+#         if user['id'] == user_id:
+#             return user
+#     return (user_id, from_user.username, from_user.full_name)
+
+
+
+async def check_user(users_info, id):
+    for user in users_info:
+        if user["id"] == id:
+            return user
+
+@dp.message(Command("orders"))
+async def orders(message: types.Message):
+    info_about_user = await read_users_from_file()
+    is_user = await check_user(info_about_user, message.from_user.username)
+    if is_user:
+        print(is_user["database_username"])
+    else:
+        print("User not found")
+
+
+
 
 
 async def main() -> None:
