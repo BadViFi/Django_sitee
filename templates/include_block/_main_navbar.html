@@ -1,0 +1,56 @@
+<a class="btn btn-outline-primary btn-sm" href="{% url 'admin:index' %}">Admin</a>
+<nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'main:index' %}"><img src="https://www.svgrepo.com/show/349342/docker.svg"  width="40" height="40">SigmaPythonHUB</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'main:ja sigma' %}">About Us</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'main:ja sigmach' %}">Contacts</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'blog:index' %}">Article</a> 
+            
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'catalog:index' %}">Категорії</a>
+          </li>
+
+
+
+
+        </ul>
+        <form class="d-flex" role="search" method="get" action="{% url 'blog:index' %}">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
+          <button class="btn btn-success" type="submit">Search</button>
+        </form>
+        <div class="d-flex gap-2 ms-3">
+          {% if user.is_authenticated %}
+          <!-- Карзина -->
+          <a class="btn btn-outline-primary btn-sm" href="{% url 'order:cart' %}"><i class="fa-solid fa-shopping-cart"></i>Корзина</a>
+          <div class="dropdown text-end">
+            <a href="" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="{{user.profile.get_avatar}}" alt="mdo" width="32" height="32" class="rounded-circle">
+            </a>
+            <ul class="dropdown-menu text-small" style="">
+              <li><a class="dropdown-item" href="{% url 'members:profile' user.username %}"><i class="fa-solid fa-user"></i>Профіль</a></li>
+              <li><a class="dropdown-item" href="{% url 'members:search_profile' %}"><i class="fa-solid fa-user-magnifying-glass"></i>Пошук користувачів</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% url 'members:logout' %}"><i class="fa-solid fa-right-from-bracket"></i>Sign out</a></li>
+            </ul>
+          </div>
+            {% else %}
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'members:login' %}"><i class="fa-solid fa-right-to-bracket"></i>Увійти</a>
+            <a class="btn btn-outline-warning btn-sm" href="{% url 'members:signup' %}"><i class="fa-solid fa-user-plus"></i>Зареєструватися</a>
+          {% endif %}
+      </div>
+    </div>
+  </nav>

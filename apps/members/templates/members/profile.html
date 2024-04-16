@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}Профіль{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="mt-4 rounded-3 bg-body-tertiary p-4">
+
+    <div class="row g-4">
+        <div class="col-12 col-md-4">
+          <img src="{{profile.get_avatar}}" class="img-fluid rounded-circle mx-auto d-block" alt="...">
+          {% if another_user %}         
+
+          <div class="d-flex justify-content-center mt-2">
+            {% if not is_following %}
+            <a href="{% url 'members:follow' user_profile.username %}" class="btn btn-primary">Підписатися</a>
+            {% else %}
+            <a href="{% url 'members:follow' user_profile.username %}" class="btn btn-danger">Відписатися</a>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+        {% if not profile.is_private or not another_user %}
+        <div class="col-8">
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <a class="nav-link active" id="simple-tab-0" data-bs-toggle="tab" href="#simple-tabpanel-0" role="tab" aria-controls="simple-tabpanel-0" aria-selected="true">Info</a>
+            </li>
+            {% if not another_user %}
+            <li class="nav-item" role="presentation">
+              <a class="nav-link" id="simple-tab-2" data-bs-toggle="tab" href="#simple-tabpanel-2" role="tab" aria-controls="simple-tabpanel-2" aria-selected="false">Orders</a>
+            </li>
+            <li class="nav-item" role="presentation">
+              <a class="nav-link" id="simple-tab-1" data-bs-toggle="tab" href="#simple-tabpanel-1" role="tab" aria-controls="simple-tabpanel-1" aria-selected="false">Settings</a>
+            </li>
+            {% endif %}
+          </ul>
+          <div class="tab-content pt-5" id="tab-content">
+            <div class="tab-pane active" id="simple-tabpanel-0" role="tabpanel" aria-labelledby="simple-tab-0">
+              <p>Ім'я користувача: {{ user_profile.username }}</p>
+              <p>Ім'я: {{ user_profile.first_name }}</p>
+              <p>Прізвище: {{ user_profile.last_name }}</p>
+              <p>Електронна пошта: {{ user_profile.email }}</p>
+              <p>Дата реєстрації: {{ user_profile.date_joined }}</p>
+              <p>Дата останнього входу: {{ user_profile.last_login }}</p>
+              <p>Біо: {{ profile.bio|safe }}</p>
+              <p>Дата народження: {{ profile.birth_date }}</p>
+              <p>Місце проживання: {{ profile.location }}</p>
+
+            </div>
+            {% if not another_user %}   
+            <div class="tab-pane" id="simple-tabpanel-2" role="tabpanel" aria-labelledby="simple-tab-2">
+              <h5>Замовлення</h5>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">№</th>
+                    <th scope="col">Дата</th>
+                    <th scope="col">Остання зміна</th>
+                    <th scope="col">Сума</th>
+                    <th scope="col">Статус</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for order in orders.all %}
+                  <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ order.created_at }}</td>
+                    <td>{{ order.updated_at }}</td>
+                    <td>{{ order.total_price }}</td>
+                    <td>{{ order.get_status_display }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+          </div>     
+            <div class="tab-pane" id="simple-tabpanel-1" role="tabpanel" aria-labelledby="simple-tab-1">
+                <h5>Редагування профілю</h5>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                  Змінити профіль
+                </button>
+                <hr class="my-4">
+                <h5>Приватність</h5>
+                <form action="{% url 'members:privacy' user_profile.username %}" method="post">
+                  {% csrf_token %}
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" name="is_private" {% if profile.is_private %} checked {% endif %}>
+                    <label class="form-check-label" for="flexCheckDefault">
+                      Приватний профіль
+                    </label>
+                  </div>
+                  <button type="submit" class="btn btn-primary mt-4">Зберегти</button>
+                </form>
+                <hr class="my-4">
+                <h5>Змінити пароль</h5>
+                <a href="{% url 'members:change_password' %}" class="btn btn-primary">Змінити пароль</a>
+                <hr class="my-4">              
+
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% if profile.get_following %}
+        <div class="col-12">
+          <hr class="my-4">
+          <h3 class="text-center">Підписники</h3>
+          <div class="row g-4">
+            <ul class="list-unstyled">
+            {% for follower in profile.get_following %}
+            <li><div class="d-flex align-items-left">
+              <img src="{{follower.get_avatar}}" class="rounded-circle" alt="..." style="width: 30px; height: 30px;">
+              <a href="{% url 'members:profile' follower.user.username %}" class="text-decoration-none text-primary hover-underline">
+                  <small class="ms-3">@{{ follower.user.username }}</small>
+              </a>
+          </div></li>
+
+            {% endfor %}  
+          </ul>
+          </div>
+        </div>
+      {% endif %}
+</div>
+
+{% if not profile.is_private or not another_user  %}
+<div class="mt-4 rounded-3 bg-body-tertiary p-4">
+  <h3 class="text-center">Пости</h3>
+  <center>
+    <h5>Кількість постів: {{ counter }} </h5>
+  </center>
+
+  {% if not another_user %}
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          Створити пост
+       </button>
+  <hr class="my-4">
+  {% include 'blog/_include_blocks/_posts_show.html' with posts=user_profile.posts.all edit=True %}
+  {% else %}
+  <hr class="my-4">
+  {% include 'blog/_include_blocks/_posts_show.html' with posts=user_profile.posts.all edit=False %}
+  {% endif %} 
+</div>
+{% endif %}
+
+{% if not another_user %}
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="editProfileModalLabel">Редагувати профіль</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="{% url 'members:profile_update' %}" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ user_form | crispy}}
+              {{ profile_form | crispy }}
+              <button type="submit" class="btn btn-primary mt-4">Зберегти</button>
+            </form>
+        </div>
+      </div>
+    </div>
+{% endif %}
+
+<script>
+    
+  function like(post_id){
+      fetch('{% url "blog:like" 0 %}'.replace('0', post_id))
+      .then(response => response.json())
+      .then(data => {
+          document.getElementById('btn_like_' + post_id).innerText = `👍 ${data.likes}`;
+      })
+  }
+
+  {% for post in user_profile.posts.all %}
+      document.getElementById('btn_like_{{post.id}}').addEventListener('click', function(){
+          like({{post.id}});
+      });
+  {% endfor %}
+
+</script>
+
+<script>
+    
+  function dis_like(post_id){
+      fetch('{% url "blog:dis_like" 0 %}'.replace('0', post_id))
+      .then(response => response.json())
+      .then(data => {
+          document.getElementById('btn_dis_like_' + post_id).innerText = `👎 ${data.dis_likes}`;
+      })
+  }
+
+  {% for post in user_profile.posts.all %}
+      document.getElementById('btn_dis_like_{{post.id}}').addEventListener('click', function(){
+          dis_like({{post.id}});
+      });
+  {% endfor %}
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+
+{% block title %}Зареєструватися{% endblock %}
+
+
+
+{% block content %}
+
+<div class="mt-4 rounded-3 bg-body-tertiary p-4">
+        <h3 class="text-center">Зареєструватися</h3>
+        <form method="post">
+            {% csrf_token %}    
+            {{form | crispy}}
+            <button type="submit" class="btn btn-primary">Зареєструватися</button>
+            <span class="ms-2">або <a href="{% url 'members:login' %}">увійти</a></span>
+        </form>
+{% endblock %}
