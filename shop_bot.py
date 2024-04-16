@@ -138,6 +138,7 @@ async def delete_user_from_file(message: types.Message) -> None:
 
         with open('users.json', 'w') as f:
             json.dump(updated_users, f, indent=4)
+        await message.answer("ви успішно вийшли з аккаунту")
         
     except FileNotFoundError:
         print("Файл не знайдений")
@@ -157,7 +158,16 @@ async def check_user(id):
 
 
 
-
+def fetch_orders(data_us):
+    orders = Order.objects.filter(user__username=data_us)
+    orders_info = ""
+    for order in orders:
+        orders_info += f"Заказ {order.id}:\n" \
+                       f"Дата создания: {order.created_at}\n" \
+                       f"Дата обновления: {order.updated_at}\n" \
+                       f"Общая цена: {order.total_price}\n" \
+                       f"Статус: {order.get_status_display()}\n\n"
+    return orders_info
 
 @dp.message(Command('orders'))
 async def get_user_orders(message: types.Message):
@@ -165,29 +175,14 @@ async def get_user_orders(message: types.Message):
         user = await check_user(message.from_user.username)
         data_us = user["database_username"]
         
-        thread = threading.Thread(target=fetch_orders, args=(data_us,))
-        thread.start()
+        orders_info = await sync_to_async(fetch_orders)(data_us)
         
-        await message.answer("Заказы обрабатываются, пожалуйста, подождите.")
+        await message.answer(orders_info)
         
     except Exception as e:
-        print(f"Произошла ошибка: {e}")
+        print(f"помилка: {e}")
 
 
-
-
-    
-
-
-def fetch_orders(data_us):
-    orders = Order.objects.filter(user__username=data_us)
-    for order in orders:
-        print(f'Заказ {order.id}:')
-        print(f'Дата создания: {order.created_at}')
-        print(f'Дата обновления: {order.updated_at}')
-        print(f'Общая цена: {order.total_price}')
-        print(f'Статус: {order.get_status_display()}')
-        print('\n')
 
 
 
