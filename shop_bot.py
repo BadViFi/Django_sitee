@@ -1,15 +1,18 @@
-import asyncio
-import logging
 import os
 import sys
+import asyncio
+import logging
 
-from PIL import Image
-from decouple import config
+# Установка переменной окружения до импорта Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 import django
+django.setup()
+
+from decouple import config
+from PIL import Image
 import json
-
-
 import threading
+
 from aiogram import Bot, Dispatcher, types
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup, default_state
@@ -21,19 +24,12 @@ from aiogram.types import Message
 from aiogram.utils.markdown import bold
 from asgiref.sync import sync_to_async
 from django.contrib.auth.hashers import make_password, check_password
-
+from django.contrib.auth.models import User
+from apps.order.models import Order
 
 API_TOKEN = config('API_TOKEN')
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
-
-django.setup()
-
-
-from django.contrib.auth.models import User
-from apps.order.models import Order
 
 
 class RegisterState(StatesGroup):
@@ -184,6 +180,20 @@ async def get_user_orders(message: types.Message):
 
 
 
+def send_telegram_notification(old_status, new_status, username):
+    chat_id = 1031341752 
+    status = (f"Статус заказа изменён: {old_status} -> {new_status}. Пользователь: {username}")
+    
+    
+
+
+
+# async def get_user_orders(message: types.Message):
+#     chat_id = 1031341752 
+#     status = await sync_to_async(send_telegram_notification)
+#     bot.send_message(chat_id=chat_id, text=message)
+#     print(status)
+    
 
 
 
