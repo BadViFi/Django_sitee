@@ -5,6 +5,6 @@ class OrderConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'apps.order'
     
-    def ready(self):
-        import apps.order.signals 
+    # def ready(self):
+    #     import apps.order.signals 
     

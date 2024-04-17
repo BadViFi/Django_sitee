@@ -13,7 +13,9 @@ from PIL import Image
 import json
 import threading
 
-from aiogram import Bot, Dispatcher, types
+
+
+from aiogram import Bot, Dispatcher, types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup, default_state
 from aiogram.utils.keyboard import InlineKeyboardBuilder
@@ -30,7 +32,7 @@ from apps.order.models import Order
 API_TOKEN = config('API_TOKEN')
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
-
+existing_orders_markup = None 
 
 class RegisterState(StatesGroup):
     say_username = State()
@@ -156,48 +158,118 @@ async def check_user(id):
 
 def fetch_orders(data_us):
     orders = Order.objects.filter(user__username=data_us)
-    orders_info = ""
-    for order in orders:
-        orders_info += f"Заказ {order.id}:\n" \
-                       f"Дата создания: {order.created_at}\n" \
-                       f"Дата обновления: {order.updated_at}\n" \
-                       f"Общая цена: {order.total_price}\n" \
-                       f"Статус: {order.get_status_display()}\n\n"
-    return orders_info
+    orders_info_list = []
+    for order in reversed(orders):
+        order_info = f"Заказ {order.id}:\n" \
+                     f"Дата создания: {order.created_at}\n" \
+                     f"Дата обновления: {order.updated_at}\n" \
+                     f"Общая цена: {order.total_price}\n" \
+                     f"Статус: {order.get_status_display()}\n\n"
+        orders_info_list.append(order_info)
+    return orders_info_list
+
+
+
+
+
+
+
+# def send_telegram_notification(old_status, new_status, username):
+#     status = (f"Статус заказа изменён: {old_status} -> {new_status}. Пользователь: {username}")
+    
+    
+    
+
+mainmenu = InlineKeyboardBuilder()
+mainmenu.row(types.InlineKeyboardButton(text="Ваші замовлення", callback_data="us_orders"))
+        
+        
+        
+def gen_button_orders_list(num_order, orders):
+    markup = InlineKeyboardBuilder()
+    # Получаем количество заказов
+    length_orders = len(orders)
+    if num_order == 0:
+        markup.row(
+            types.InlineKeyboardButton(text="⏭️Наступний", callback_data=f"orders_list_{num_order+1}")
+        )
+    elif num_order == length_orders - 1:
+        markup.row(
+            types.InlineKeyboardButton(text="⏮️Назад", callback_data=f"orders_list_{num_order-1}"),
+            types.InlineKeyboardButton(text=f"{num_order+1}/{length_orders}", callback_data="none"),
+            types.InlineKeyboardButton(text="🔚Кінець", callback_data=f"orders_list_0")
+        )
+    else:
+        markup.row(
+            types.InlineKeyboardButton(text="⏮️Назад", callback_data=f"orders_list_{num_order-1}"),
+            types.InlineKeyboardButton(text=f"{num_order+1}/{length_orders}", callback_data="none"),
+            types.InlineKeyboardButton(text="⏭️Наступний", callback_data=f"orders_list_{num_order+1}")
+        )
+    return markup
+
+
+
+
+
+        
+        
 
 @dp.message(Command('orders'))
-async def get_user_orders(message: types.Message):
+async def get_user_orders(message: types.Message, state: FSMContext):
     try:
         user = await check_user(message.from_user.username)
         data_us = user["database_username"]
         
-        orders_info = await sync_to_async(fetch_orders)(data_us)
-        
-        await message.answer(orders_info)
-        
+        orders_info_list = await sync_to_async(fetch_orders)(data_us)
+        if not orders_info_list:
+            await message.answer("В вас нема замовлень")
+            return
+        elif len(orders_info_list) <= 3:
+            await message.answer("\n\n".join(orders_info_list))
+            return
+
+        current_order_index = 0
+        current_order_info = orders_info_list[current_order_index]
+
+        markup = gen_button_orders_list(current_order_index, orders_info_list)
+        await message.answer(current_order_info, reply_markup=markup.as_markup())
+
+        # Сохраняем информацию о текущем заказе в контексте, чтобы использовать её при перелистывании
+        await state.update_data(orders_info_list=orders_info_list, current_order_index=current_order_index)
+
     except Exception as e:
         print(f"помилка: {e}")
 
 
-
-def send_telegram_notification(old_status, new_status, username):
-    chat_id = 1031341752 
-    status = (f"Статус заказа изменён: {old_status} -> {new_status}. Пользователь: {username}")
+@dp.callback_query(F.data.startswith("orders_list_"))
+async def next_order(call: types.CallbackQuery, state: FSMContext):
+    call.message.delete_reply_markup()
+    user = await check_user(call.from_user.username)
+    data_us = user["database_username"]
+    orders_info_list = await sync_to_async(fetch_orders)(data_us)
     
-    
+    num_order = int(call.data.split("_")[-1])
+    try:
+        order_info = orders_info_list[num_order]
+    except IndexError:
+        call.message.answer("Такого заказа не існує")
+        try:
+            await call.message.delete()
+        except:
+            pass
 
+    markup = gen_button_orders_list(num_order, orders_info_list)
+    await call.message.answer(order_info, reply_markup=markup.as_markup())
 
-
-# async def get_user_orders(message: types.Message):
-#     chat_id = 1031341752 
-#     status = await sync_to_async(send_telegram_notification)
-#     bot.send_message(chat_id=chat_id, text=message)
-#     print(status)
-    
-
-
-
-
+    try:
+        await call.message.delete()
+    except:
+        pass
+        
+        
+        
+        
+        
 async def main() -> None:
     bot = Bot(API_TOKEN, parse_mode=ParseMode.HTML)
     await dp.start_polling(bot)
