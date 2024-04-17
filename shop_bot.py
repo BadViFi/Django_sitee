@@ -84,9 +84,6 @@ async def login(message: types.Message, state: FSMContext):
 
     users = await read_users_from_file()
     
-
-
-
     existing_user = next((u for u in users if u.get('database_username') == user.username), None)
     if existing_user and existing_user.get('id') == message.from_user.username:
         await message.answer("такий користувач вже знайден")
@@ -109,11 +106,6 @@ async def login(message: types.Message, state: FSMContext):
     await state.clear()
 
 
-
-    
-        
-
-
 async def read_users_from_file():
     try:
         with open('users.json', 'r') as f:
@@ -122,8 +114,7 @@ async def read_users_from_file():
         
     except FileNotFoundError:
         return []
-    
-    
+  
    
 @dp.message(Command("logout"))
 async def delete_user_from_file(message: types.Message) -> None:
@@ -141,9 +132,6 @@ async def delete_user_from_file(message: types.Message) -> None:
     except FileNotFoundError:
         print("Файл не знайдений")
 
-    
-    
-
 
 
 async def check_user(id):
@@ -151,10 +139,6 @@ async def check_user(id):
     for user in users_info:
         if user["id"] == id:
             return user
-
-
-
-
 
 def fetch_orders(data_us):
     orders = Order.objects.filter(user__username=data_us)
@@ -170,10 +154,6 @@ def fetch_orders(data_us):
 
 
 
-
-
-
-
 # def send_telegram_notification(old_status, new_status, username):
 #     status = (f"Статус заказа изменён: {old_status} -> {new_status}. Пользователь: {username}")
     
@@ -182,8 +162,7 @@ def fetch_orders(data_us):
 
 mainmenu = InlineKeyboardBuilder()
 mainmenu.row(types.InlineKeyboardButton(text="Ваші замовлення", callback_data="us_orders"))
-        
-        
+         
         
 def gen_button_orders_list(num_order, orders):
     markup = InlineKeyboardBuilder()
@@ -208,12 +187,6 @@ def gen_button_orders_list(num_order, orders):
     return markup
 
 
-
-
-
-        
-        
-
 @dp.message(Command('orders'))
 async def get_user_orders(message: types.Message, state: FSMContext):
     try:
@@ -234,7 +207,6 @@ async def get_user_orders(message: types.Message, state: FSMContext):
         markup = gen_button_orders_list(current_order_index, orders_info_list)
         await message.answer(current_order_info, reply_markup=markup.as_markup())
 
-        # Сохраняем информацию о текущем заказе в контексте, чтобы использовать её при перелистывании
         await state.update_data(orders_info_list=orders_info_list, current_order_index=current_order_index)
 
     except Exception as e:
@@ -265,9 +237,6 @@ async def next_order(call: types.CallbackQuery, state: FSMContext):
         await call.message.delete()
     except:
         pass
-        
-        
-        
         
         
 async def main() -> None:
