@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'captcha',
     'crispy_forms',
     'crispy_bootstrap5',
+    'rest_framework',
 
      
     'apps.main',
@@ -165,7 +166,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'members:login'
 LOGOUT_URL = 'members:logout'
-LOGIN_REDIRECT_URL = 'members:profile'
+LOGIN_REDIRECT_URL = 'main:index'
 
 
 CKEDITOR_UPLOAD_PATH = 'uploads/'
