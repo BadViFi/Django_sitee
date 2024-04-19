@@ -165,7 +165,6 @@ def fetch_orders(data_us):
     
     
     
-
 mainmenu = InlineKeyboardBuilder()
 mainmenu.row(types.InlineKeyboardButton(text="Ваші замовлення", callback_data="us_orders"))
          
@@ -216,7 +215,7 @@ async def get_user_orders(message: types.Message, state: FSMContext):
         await state.update_data(orders_info_list=orders_info_list, current_order_index=current_order_index)
 
     except Exception as e:
-        await message.answer("сталася помилкаaaaa")
+        await message.answer("сталася помилка")
         print(f"помилка: {e}")
 
 

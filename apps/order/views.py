@@ -10,6 +10,8 @@ from django.db import transaction
 from apps.main.mixins import ListViewBreadcrumbMixin
 from .forms import CartAddProductForm, OrderCreateForm, CartUpdateForm
 from .models import Cart, OrderProduct, Order
+from decimal import Decimal
+import json
 # Create your views here.
 
 def get_cart_data(user_id):
@@ -25,9 +27,30 @@ class CartView(LoginRequiredMixin, ListViewBreadcrumbMixin):
     def get_queryset(self):
         return Cart.objects.filter(user=self.request.user).prefetch_related('product').prefetch_related('product__images')
     
+    
+    def discount(self):
+        with open('users.json', 'r') as file:
+            data = json.load(file)
+            username = self.request.user.username  
+            for user_data in data:
+                if user_data['database_username'] == username:
+                    return True  
+        return False 
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['total_price'] = sum([item.total_price() for item in self.get_queryset()])
+        total_price = sum([item.total_price() for item in self.get_queryset()])
+        discount_applied = self.discount()  # Проверяем, применена ли скидка
+        if discount_applied:
+            total_price_with_discount = total_price * Decimal('0.95')
+            discounted = True
+        else:
+            total_price_with_discount = total_price
+            discounted = False
+        context['total_price'] = total_price_with_discount
+        context['total_price_without_discount'] = total_price 
+        context['discount_applied'] = discount_applied
+        context['discounted'] = discounted 
         return context
     
     def get_breradcrumb(self):
