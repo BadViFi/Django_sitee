@@ -40,10 +40,16 @@ class RegisterState(StatesGroup):
     say_tg_username = State()
 
 
+@dp.message(Command("start"))
+async def username(message: types.Message, state: FSMContext):
+    await message.answer("це особистий кабінет для пайтон сайта, натисніть - /login щоб зареєструватися, /logout щоб вийти з аккаунту, /orders щоб подивитись свої замовлення")
+
+
+
 @dp.message(Command("login"))
 async def username(message: types.Message, state: FSMContext):
     await state.set_state(RegisterState.say_username)
-    await message.answer("надішліть ваш юзернейм")
+    await message.answer("надішліть ваш юзернейм на сайті")
     
     
     
@@ -56,7 +62,7 @@ async def password(message: types.Message, state: FSMContext):
         await state.set_state(RegisterState.say_password)
         await message.answer("надішліть ваш пароль")
     except:
-        await message.answer("сталася помилкаaaaa")
+        await message.answer("сталася помилка")
     
     
 @dp.message(RegisterState.say_password)
@@ -102,7 +108,7 @@ async def login(message: types.Message, state: FSMContext):
     with open('users.json', 'w') as f:
         json.dump(users, f, indent=4)
 
-    await message.answer(f"ви успішно увійшли як {user.username}")
+    await message.answer(f"ви успішно увійшли як {user.username}, натисніть /orders, щоб подивитися свої замовлення")
     await state.clear()
 
 
@@ -159,7 +165,6 @@ def fetch_orders(data_us):
     
     
     
-
 mainmenu = InlineKeyboardBuilder()
 mainmenu.row(types.InlineKeyboardButton(text="Ваші замовлення", callback_data="us_orders"))
          
@@ -210,6 +215,7 @@ async def get_user_orders(message: types.Message, state: FSMContext):
         await state.update_data(orders_info_list=orders_info_list, current_order_index=current_order_index)
 
     except Exception as e:
+        await message.answer("сталася помилка")
         print(f"помилка: {e}")
 
 

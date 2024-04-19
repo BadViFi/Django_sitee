@@ -38,12 +38,19 @@
                 </tr>
                 {% endfor %}
                 <tr>
-                 <td colspan="5">Всього</td>
-                 <td>{{ total_price }}</td>
-                 <td>
-                      <a href="{% url 'order:cart_clear' %}" class="btn btn-danger btn-sm">Очистити</a>
-                 </td>
+                    <td colspan="1">
+                        Всього:
+                        {% if discounted %}
+                        <del>{{ total_price_without_discount }} грн</del>
+                        {% endif %}
+                    </td>
+                    <td colspan="4"></td> 
+                    <td>{{ total_price }} грн</td>
+                    <td>
+                        <a href="{% url 'order:cart_clear' %}" class="btn btn-danger btn-sm">Очистить</a>
+                    </td>
                 </tr>
+                
           </tbody>
      </table>
      <a href="{% url 'order:cart_ordering' %}" class="btn btn-success">Оформити замовлення</a>

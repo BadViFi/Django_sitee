@@ -5,7 +5,7 @@ from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 
 from ckeditor.fields import RichTextField
-
+from django.urls import reverse, reverse_lazy
 
 # Create your models here.
 class Profile(models.Model):
@@ -43,6 +43,11 @@ class Profile(models.Model):
         if self.avatar:
             return self.avatar_thumbnail.url
         return '/media/avatars/default.png'
+    
+    
+    def get_absolute_url(self):
+        return reverse_lazy('members:profile', kwargs={'username': self.user.username})
+    
     
     def __str__(self):
         return f'{self.user.username}'
