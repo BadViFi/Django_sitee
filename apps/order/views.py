@@ -1,76 +1,63 @@
-from django.shortcuts import render,redirect, get_object_or_404
-from django.urls import reverse
-
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import View, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db import transaction
-
-from apps.main.mixins import ListViewBreadcrumbMixin
-from .forms import CartAddProductForm, OrderCreateForm, CartUpdateForm
-from .models import Cart, OrderProduct, Order
+from django.contrib.auth.models import User
 from decimal import Decimal
 import json
-# Create your views here.
+
+from .forms import CartAddProductForm, OrderCreateForm, CartUpdateForm
+from .models import Cart, OrderProduct, Order
+
+def discount(username):
+    with open('users.json', 'r') as file:
+        data = json.load(file)
+        for user_data in data:
+            if user_data['database_username'] == username:
+                return True
+    return False
 
 def get_cart_data(user_id):
+    user = User.objects.get(id=user_id)
+    username = user.username
     cart = Cart.objects.filter(user=user_id).prefetch_related('product').prefetch_related('product__images')
     total_price = sum([item.total_price() for item in cart])
-    return {'cart': cart, 'total_price': total_price}
 
-class CartView(LoginRequiredMixin, ListViewBreadcrumbMixin):
+    # Проверяем, есть ли скидка для текущего пользователя
+    discounted = discount(username)
+
+    # Если скидка есть и у заказа не применялась, применяем ее к общей стоимости
+    if discounted and not Order.objects.filter(user=user, discount_applied=False).exists():
+        total_price = total_price * Decimal('0.95') 
+        print("После скидки:", total_price)  # Применяем скидку 5%
+
+    return {'cart': cart, 'total_price': total_price, 'discounted': discounted}
+
+class CartView(LoginRequiredMixin, ListView):
     model = Cart
     template_name = 'order/cart.html'
     context_object_name = 'cart'
-    
+
     def get_queryset(self):
         return Cart.objects.filter(user=self.request.user).prefetch_related('product').prefetch_related('product__images')
-    
-    
-    def discount(self):
-        with open('users.json', 'r') as file:
-            data = json.load(file)
-            username = self.request.user.username  
-            for user_data in data:
-                if user_data['database_username'] == username:
-                    return True  
-        return False 
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        total_price = sum([item.total_price() for item in self.get_queryset()])
-        discount_applied = self.discount()  # Проверяем, применена ли скидка
-        if discount_applied:
-            total_price_with_discount = total_price * Decimal('0.95')
-            discounted = True
-        else:
-            total_price_with_discount = total_price
-            discounted = False
-        context['total_price'] = total_price_with_discount
-        context['total_price_without_discount'] = total_price 
-        context['discount_applied'] = discount_applied
-        context['discounted'] = discounted 
+        cart_data = get_cart_data(self.request.user.id)
+        context['cart'] = cart_data['cart']
+        context['total_price'] = cart_data['total_price']
+        context['discounted'] = cart_data['discounted']
+        context['total_price_without_discount'] = sum([item.total_price() for item in cart_data['cart']])
         return context
-    
-    def get_breradcrumb(self):
-        self.breadcrumbs = {
-            'current': 'Кошик',
-        }
-        return self.breadcrumbs
-
-        
-    
 
 class AddToCartView(LoginRequiredMixin, View):
     def get(self, request):
-        data = request.GET.copy() # Копіюємо дані з запиту
+        data = request.GET.copy() 
         data.update(user=request.user)
         request.GET = data
-        
         form = CartAddProductForm(request.GET)
 
-        
         if form.is_valid():
             cart = form.save(commit=False)
             product_in_cart = Cart.objects.filter(user=request.user, product=cart.product).first()
@@ -78,7 +65,6 @@ class AddToCartView(LoginRequiredMixin, View):
                 product_in_cart.quantity = cart.quantity
                 product_in_cart.save()
                 messages.success(request, f'Кількість товару {cart.product.name} змінено на {cart.quantity}')
-                
             else:
                 cart.save()
                 messages.success(request, f'Товар {cart.product.name} додано в корзину')
@@ -86,8 +72,6 @@ class AddToCartView(LoginRequiredMixin, View):
         else:
             messages.error(request, 'Помилка додавання товару в корзину')
             return redirect('catalog:index')
-        
-        
         
         
 class DeleteFromCartView(LoginRequiredMixin, View):
@@ -104,43 +88,46 @@ class ClearCartView(LoginRequiredMixin, View):
         messages.success(request, 'Корзина очищена')
         return redirect('order:cart')
 
-
 class CartOrderingView(CartView):
     template_name = 'order/cart_ordering.html'
-    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        cart_data = get_cart_data(self.request.user.id)
+        context['cart'] = cart_data['cart']
+        context['total_price'] = cart_data['total_price']
         context['form'] = OrderCreateForm()
         return context
 
-    def get_breradcrumb(self):
-        self.breadcrumbs = {
-            f'{reverse("order:cart")}': 'Кошик',
-            'current': 'Оформлення замовлення',
-        }   
-        return self.breadcrumbs
-
     def post(self, request):
-        form = OrderCreateForm(request.POST)
         cart_data = get_cart_data(request.user.id)
+        form = OrderCreateForm(request.POST)
         if form.is_valid():
             order = form.save(commit=False)
             order.user = request.user
-            order.total_price = cart_data.get('total_price')
-            order.save()
 
-            #очищаємо корзину і добавляємо товари в замовлення в одній транзакції
+
+            if not order.discount_applied:
+                discounted = discount(request.user.username)
+                if discounted:
+                    total_price = cart_data.get('total_price') * Decimal('0.95') 
+                    total_price += total_price * Decimal('0.05')
+                else:
+                    total_price = cart_data.get('total_price')
+                order.total_price = total_price
+                order.discount_applied = True 
+                order.save()
+
             with transaction.atomic():
                 for item in cart_data.get('cart'):
                     order_product = OrderProduct(
-                        order=order, 
-                        product=item.product, 
-                        quantity=item.quantity, 
+                        order=order,
+                        product=item.product,
+                        quantity=item.quantity,
                         price=item.product.price)
                     order_product.save()
-                    item.product.quantity -= item.quantity # зменшуємо кількість товару на складі
-                    item.product.save() # зберігаємо зміни
+                    item.product.quantity -= item.quantity
+                    item.product.save()
                 Cart.objects.filter(user=request.user).delete()
 
             messages.success(request, 'Замовлення успішно оформлено')
@@ -149,20 +136,23 @@ class CartOrderingView(CartView):
             messages.error(request, f'Помилка оформлення замовлення: {form.errors}')
             return redirect('order:cart_ordering')
 
+
+
 class OrderComplete(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-
         order_id = kwargs.get('order_id')
+        order = Order.objects.get(pk=order_id)
 
         context = {
-            'order': Order.objects.get(pk=order_id)
-        } 
+            'order': order,
+            'total_price': order.total_price,
+        }
         return render(request, 'order/order_complete.html', context=context)
 
     def post(self, request):
         return redirect('order:cart')
-    
-    
+
+
 class CartUpdateView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         cart_id = kwargs.get('cart_id')
@@ -179,12 +169,11 @@ class CartUpdateView(LoginRequiredMixin, View):
             cart.save()
 
         if cart.quantity > cart.product.quantity:
-                messages.add_message(request, messages.ERROR, f'На складі недостатньо товару {cart.product.name}', extra_tags='danger')
-                cart.quantity = cart.product.quantity
-                cart.save()
-                return redirect('order:cart')
+            messages.add_message(request, messages.ERROR, f'На складі недостатньо товару {cart.product.name}', extra_tags='danger')
+            cart.quantity = cart.product.quantity
+            cart.save()
+            return redirect('order:cart')
         messages.success(request, f'Кількість товару {cart.product.name} змінено на {cart.quantity}')
-
 
         return redirect('order:cart')
 

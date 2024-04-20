@@ -16,6 +16,11 @@
             <a class="nav-link" href="{% url 'main:ja sigmach' %}">Contacts</a>
           </li>
 
+          {% comment %} <li class="nav-item">
+            <a class="nav-link" href="https://t.me/pol_6it">link</a>
+
+          </li> {% endcomment %}
+
           <li class="nav-item">
             <a class="nav-link" href="{% url 'blog:index' %}">Article</a> 
             
@@ -46,9 +51,13 @@
             </a>
             <ul class="dropdown-menu text-small" style="">
               <li><a class="dropdown-item" href="{% url 'members:profile' user.username %}"><i class="fa-solid fa-user"></i>Профіль</a></li>
-              <li><a class="dropdown-item" href="{% url 'members:search_profile' %}"><i class="fa-solid fa-user-magnifying-glass"></i>Пошук користувачів</a></li>
+              <li><a class="dropdown-item" href="{% url 'members:search_profile' %}"><i class="fas fa-search"></i>Пошук користувачів</a></li>
+              <li><a class="dropdown-item" href="https://t.me/Django_web_bot"><i class="fab fa-telegram"></i>Наш бот</a></li>
+              <li><a class="dropdown-item" href="https://t.me/pol_6it"><i class="fab fa-telegram"></i>Я в телеграмі</a></li>
+              <li><a class="dropdown-item" href="https://github.com/BadViFi"><i class="fab fa-github"></i>Мій GitHub</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="{% url 'members:logout' %}"><i class="fa-solid fa-right-from-bracket"></i>Sign out</a></li>
+            
             </ul>
           </div>
             {% else %}

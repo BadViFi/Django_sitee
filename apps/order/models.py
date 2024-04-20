@@ -47,7 +47,7 @@ class Order(models.Model):
         (False, 'Не оплачено')
     )
 
-
+    discount_applied = models.BooleanField(default=False)
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE, verbose_name='Користувач')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Загальна вартість')
 

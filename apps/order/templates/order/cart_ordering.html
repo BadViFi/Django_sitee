@@ -1,63 +1,61 @@
 {% extends 'base.html' %}
 
-{% block title %}Каталог{% endblock %}
+{% block title %}Корзина{% endblock %}
 
 {% load crispy_forms_tags %}
 
-
 {% block content %}
-
-   <!-- Таблиця карзина -->
-    <div class="container mt-3">
-        <div class="row">
-         <div class="col-6">
-
-                <h3>Корзина</h3>
-                <table class="table">
-                    <thead>
-                            <tr>
-                            <th scope="col">№</th>
-                            <th scope="col">Назва</th>
-                            <th scope="col">Ціна</th>
-                            <th scope="col">Кількість</th>
-                            <th scope="col">Сума</th>
-                            <th scope="col">Дія</th>
-                            </tr>
-                    </thead>
-                    <tbody>
-                            {% for item in cart %}
-                            <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td><a href="{{item.product.get_absolute_url}}">{{ item.product.name }}</a></td>
-                            <td>{{ item.product.price }}</td>
-                            <td>{{ item.quantity }}</td>
-                            <td>{{ item.total_price }}</td>
-                            <td>
-                                <a href="{% url 'order:cart_remove' item.id %}" class="btn btn-danger btn-sm">Видалити</a>
-                            </td>
-                            </tr>
-                            {% endfor %}
-                            <tr>
-                            <td colspan="4">Всього</td>
-                            <td>{{ total_price }}</td>
-                            <td>
-                                <a href="{% url 'order:cart_clear' %}" class="btn btn-danger btn-sm">Очистити</a>
-                            </td>
-                            </tr>
-                    </tbody>
-                </table>
-            </div>
-          <div class="col-6">
-              <form action="" method="post">
-                   {% csrf_token %}
-                    {{ form | crispy }}
-                    
-                    <button type="submit" class="btn btn-primary">Замовити</button>
-                 </form> 
-          </div>
-        </div>  
- 
-
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-6">
+            <h3>Корзина</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">№</th>
+                        <th scope="col">Назва</th>
+                        <th scope="col">Ціна</th>
+                        <th scope="col">Кількість</th>
+                        <th scope="col">Сума</th>
+                        <th scope="col">Дія</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a></td>
+                        <td>{{ item.product.price }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.total_price }}</td>
+                        <td>
+                            <a href="{% url 'order:cart_remove' item.id %}" class="btn btn-danger btn-sm">Видалити</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="4">Всього</td>
+                        <td>
+                            {% if discounted %}
+                            <del>{{ total_price_without_discount }} грн</del> {{ total_price }} грн
+                            {% else %}
+                            {{ total_price }} грн
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'order:cart_clear' %}" class="btn btn-danger btn-sm">Очистити</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-6">
+            <form action="" method="post">
+                {% csrf_token %}
+                {{ form | crispy }}
+                <button type="submit" class="btn btn-primary">Замовити</button>
+            </form>
+        </div>
     </div>
-
+</div>
 {% endblock %}
