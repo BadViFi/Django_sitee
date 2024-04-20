@@ -30,7 +30,6 @@ def get_cart_data(user_id):
     # Если скидка есть и у заказа не применялась, применяем ее к общей стоимости
     if discounted and not Order.objects.filter(user=user, discount_applied=False).exists():
         total_price = total_price * Decimal('0.95') 
-        print("После скидки:", total_price)  # Применяем скидку 5%
 
     return {'cart': cart, 'total_price': total_price, 'discounted': discounted}
 
