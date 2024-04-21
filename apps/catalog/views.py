@@ -87,7 +87,7 @@ class ProductByCategoryView(ListViewBreadcrumbMixin):
     
     
 
-
+# @method_decorator(cache_page(60 * 2), name='dispatch')
 class ProductDetailView(DetailViewBreadcrumbMixin):
     model = Product
     template_name = 'catalog/product.html'

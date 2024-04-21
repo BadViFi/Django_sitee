@@ -1,0 +1,94 @@
+/* styles.css */
+
+/* Общие стили */
+body {
+    background-color: #2c214a;
+    color: #ffffff;
+}
+
+.navbar {
+    background-color: #4b3f76;
+}
+
+.navbar-brand {
+    color: #ffffff;
+}
+
+.navbar-nav .nav-link {
+    color: #ffffff;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #f8f9fa;
+}
+
+.form-control {
+    background-color: #422a6b;
+    color: #ffffff;
+    border-color: #422a6b;
+}
+
+.form-control:focus {
+    background-color: #4b3f76;
+    color: #ffffff;
+    border-color: #4b3f76;
+    box-shadow: 0 0 0 0.25rem rgba(48, 51, 107, 0.25);
+}
+
+.btn-outline-primary {
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+.btn-outline-primary:hover {
+    color: #4b3f76;
+    background-color: #ffffff;
+    border-color: #ffffff;
+}
+
+.btn-outline-warning {
+    color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-outline-warning:hover {
+    color: #ffffff;
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.dropdown-menu {
+    background-color: #4b3f76;
+    color: #ffffff;
+}
+
+.dropdown-item {
+    color: #ffffff;
+}
+
+.dropdown-item:hover {
+    background-color: #422a6b;
+}
+
+.dropdown-divider {
+    background-color: #422a6b;
+}
+
+/* Дополнительные стили для верхнего контейнера */
+.container-fluid {
+    background-color: #4b3f76;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
