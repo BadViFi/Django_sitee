@@ -37,7 +37,7 @@ class CataloglistView(ListViewBreadcrumbMixin):
         return context
     
     
-# @method_decorator(cache_page(60 * 2), name='dispatch')
+@method_decorator(cache_page(60 * 2), name='dispatch')
 class ProductByCategoryView(ListViewBreadcrumbMixin):
     model = Catalog
     template_name = 'catalog/product_by_category.html'
@@ -87,7 +87,7 @@ class ProductByCategoryView(ListViewBreadcrumbMixin):
     
     
 
-# @method_decorator(cache_page(60 * 2), name='dispatch')
+@method_decorator(cache_page(60 * 2), name='dispatch')
 class ProductDetailView(DetailViewBreadcrumbMixin):
     model = Product
     template_name = 'catalog/product.html'

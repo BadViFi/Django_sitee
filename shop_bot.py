@@ -13,8 +13,8 @@ from PIL import Image
 import json
 import threading
 
-
-
+from decimal import Decimal
+from apps.order.models import Cart
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup, default_state
@@ -243,6 +243,132 @@ async def next_order(call: types.CallbackQuery, state: FSMContext):
         await call.message.delete()
     except:
         pass
+    
+    
+    
+
+
+
+cart = InlineKeyboardBuilder()
+cart.row(types.InlineKeyboardButton(text = "Ваша корзина", callback_data="us_cart"))
+
+
+
+def fetch_cart_info(data_us):
+    try:
+        user_cart = Cart.objects.filter(user__username=data_us)
+
+        if not user_cart:
+            return ["Ваша корзина пуста."]
+
+        cart_info = []
+        total_price = 0
+
+        for index, cart_item in enumerate(user_cart, start=1):
+            product = cart_item.product
+            quantity = cart_item.quantity
+            price = product.price
+            total_item_price = quantity * price
+
+            cart_info.append(
+                f"{index}. {product.name}\n"
+                f"Количество: {quantity}\n"
+                f"Цена за единицу: {price}\n"
+                f"Общая цена: {total_item_price}\n\n"
+            )
+
+            total_price += total_item_price
+
+        cart_info.append(f"Всего: {total_price}\nС учетом скидки в 5%: {total_price * Decimal('0.95')}")
+        return cart_info
+
+    except Exception as e:
+        print(f"Ошибка при получении информации о корзине: {e}")
+        return ["Произошла ошибка при получении информации о корзине."]
+
+
+
+def gen_button_cart_list(num_cart, cart):
+    markup = InlineKeyboardBuilder()
+    # Получаем количество заказов
+    length_cart = len(cart)
+    if num_cart == 0:
+        markup.row(
+            types.InlineKeyboardButton(text="⏭️Наступний", callback_data=f"cart_list_{num_cart+1}")
+        )
+    elif num_cart == length_cart - 1:
+        markup.row(
+            types.InlineKeyboardButton(text="⏮️Назад", callback_data=f"cart_list_{num_cart-1}"),
+            types.InlineKeyboardButton(text=f"{num_cart+1}/{length_cart}", callback_data="none"),
+            types.InlineKeyboardButton(text="🔚Кінець", callback_data=f"cart_list_0")
+        )
+    else:
+        markup.row(
+            types.InlineKeyboardButton(text="⏮️Назад", callback_data=f"cart_list_{num_cart-1}"),
+            types.InlineKeyboardButton(text=f"{num_cart+1}/{length_cart}", callback_data="none"),
+            types.InlineKeyboardButton(text="⏭️Наступний", callback_data=f"cart_list_{num_cart+1}")
+        )
+    return markup
+    
+    
+    
+
+
+@dp.message(Command('cart'))
+async def get_user_cart(message: types.Message, state: FSMContext):
+    try:
+        user = await check_user(message.from_user.username)
+        data_us = user["database_username"]
+        
+        cart_info_list = await sync_to_async(fetch_cart_info)(data_us)
+        if not cart_info_list:
+            await message.answer("В вас нема ничого в карзині ")
+            return
+        elif len(cart_info_list) <= 3:
+            await message.answer("\n\n".join(cart_info_list))
+            return
+
+        current_cart_index = 0
+        current_cart_info = cart_info_list[current_cart_index]
+
+        markup = gen_button_cart_list(current_cart_index, current_cart_info)
+        await message.answer(current_cart_info, reply_markup=markup.as_markup())
+
+        await state.update_data(cart_info_list=cart_info_list, current_cart_index=current_cart_index)
+
+    except Exception as e:
+        await message.answer("сталася помилка")
+        print(f"помилка: {e}")
+    
+    
+    
+
+
+@dp.callback_query(F.data.startswith("cart_list_"))
+async def next_cart(call: types.CallbackQuery, state: FSMContext):
+    call.message.delete_reply_markup()
+    user = await check_user(call.from_user.username)
+    data_us = user["database_username"]
+    cart_info_list = await sync_to_async(fetch_cart_info)(data_us)
+    
+    num_cart = int(call.data.split("_")[-1])
+    try:
+        cart_info = cart_info_list[num_cart]
+    except IndexError:
+        call.message.answer("Такого товару не існує")
+        try:
+            await call.message.delete()
+        except:
+            pass
+
+    markup = gen_button_cart_list(num_cart, cart_info_list)
+    await call.message.answer(cart_info, reply_markup=markup.as_markup())
+
+    try:
+        await call.message.delete()
+    except:
+        pass
+
         
         
 async def main() -> None:
