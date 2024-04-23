@@ -13,6 +13,9 @@ from PIL import Image
 import json
 import threading
 
+
+import aiohttp
+from aiogram.types import InputFile
 from decimal import Decimal
 from apps.order.models import Cart
 from aiogram import Bot, Dispatcher, types, F
@@ -270,11 +273,22 @@ def fetch_cart_info(data_us):
             price = product.price
             total_item_price = quantity * price
 
+            # Извлекаем основное изображение товара из связанной модели Image
+            main_image = product.main_image()
+
+            if main_image:
+                # Получаем URL основного изображения товара
+                image_url = main_image.image.url
+            else:
+                # Если у товара нет изображения, ставим заглушку или пустую строку
+                image_url = "Здесь должно быть изображение, но его нет"
+
             cart_info.append(
                 f"{index}. {product.name}\n"
                 f"Количество: {quantity}\n"
                 f"Цена за единицу: {price}\n"
-                f"Общая цена: {total_item_price}\n\n"
+                f"Общая цена: {total_item_price}\n"
+                f"Изображение: {image_url}\n\n"
             )
 
             total_price += total_item_price
@@ -288,25 +302,27 @@ def fetch_cart_info(data_us):
 
 
 
+
+
+
 def gen_button_cart_list(num_cart, cart):
     markup = InlineKeyboardBuilder()
-    # Получаем количество заказов
     length_cart = len(cart)
     if num_cart == 0:
         markup.row(
-            types.InlineKeyboardButton(text="⏭️Наступний", callback_data=f"cart_list_{num_cart+1}")
+            types.InlineKeyboardButton(text="⏭️Наступний", callback_data=f"cart_list_{num_cart + 1}")
         )
     elif num_cart == length_cart - 1:
         markup.row(
-            types.InlineKeyboardButton(text="⏮️Назад", callback_data=f"cart_list_{num_cart-1}"),
-            types.InlineKeyboardButton(text=f"{num_cart+1}/{length_cart}", callback_data="none"),
+            types.InlineKeyboardButton(text="⏮️Назад", callback_data=f"cart_list_{num_cart - 1}"),
+            types.InlineKeyboardButton(text=f"{num_cart + 1}/{length_cart}", callback_data="none"),
             types.InlineKeyboardButton(text="🔚Кінець", callback_data=f"cart_list_0")
         )
     else:
         markup.row(
-            types.InlineKeyboardButton(text="⏮️Назад", callback_data=f"cart_list_{num_cart-1}"),
-            types.InlineKeyboardButton(text=f"{num_cart+1}/{length_cart}", callback_data="none"),
-            types.InlineKeyboardButton(text="⏭️Наступний", callback_data=f"cart_list_{num_cart+1}")
+            types.InlineKeyboardButton(text="⏮️Назад", callback_data=f"cart_list_{num_cart - 1}"),
+            types.InlineKeyboardButton(text=f"{num_cart + 1}/{length_cart}", callback_data="none"),
+            types.InlineKeyboardButton(text="⏭️Наступний", callback_data=f"cart_list_{num_cart + 1}")
         )
     return markup
     
@@ -322,7 +338,7 @@ async def get_user_cart(message: types.Message, state: FSMContext):
         
         cart_info_list = await sync_to_async(fetch_cart_info)(data_us)
         if not cart_info_list:
-            await message.answer("В вас нема ничого в карзині ")
+            await message.answer("В вашей корзине ничего нет.")
             return
         elif len(cart_info_list) <= 3:
             await message.answer("\n\n".join(cart_info_list))
@@ -337,11 +353,14 @@ async def get_user_cart(message: types.Message, state: FSMContext):
         await state.update_data(cart_info_list=cart_info_list, current_cart_index=current_cart_index)
 
     except Exception as e:
-        await message.answer("сталася помилка")
-        print(f"помилка: {e}")
+        await message.answer("Произошла ошибка.")
+        print(f"Ошибка: {e}")
+
+
     
     
     
+
 
 
 @dp.callback_query(F.data.startswith("cart_list_"))
@@ -368,6 +387,10 @@ async def next_cart(call: types.CallbackQuery, state: FSMContext):
         await call.message.delete()
     except:
         pass
+
+
+
+
 
         
         
