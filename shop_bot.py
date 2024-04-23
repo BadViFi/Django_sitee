@@ -164,7 +164,16 @@ def fetch_orders(data_us):
 
 
 # def send_telegram_notification(old_status, new_status, username):
-#     status = (f"Статус заказа изменён: {old_status} -> {new_status}. Пользователь: {username}")
+#     status = f"Статус заказа изменён: {old_status} -> {new_status}. Пользователь: {username}"
+#     print(status)
+#     await swnd_status(message, status)  # Pass both message and status
+#     return status
+    
+# @dp.message()
+# async def swnd_status(message: types.Message, status):  # Add the message argument
+#     await message.answer(status)
+
+    
     
     
     
@@ -273,22 +282,11 @@ def fetch_cart_info(data_us):
             price = product.price
             total_item_price = quantity * price
 
-            # Извлекаем основное изображение товара из связанной модели Image
-            main_image = product.main_image()
-
-            if main_image:
-                # Получаем URL основного изображения товара
-                image_url = main_image.image.url
-            else:
-                # Если у товара нет изображения, ставим заглушку или пустую строку
-                image_url = "Здесь должно быть изображение, но его нет"
-
             cart_info.append(
                 f"{index}. {product.name}\n"
                 f"Количество: {quantity}\n"
                 f"Цена за единицу: {price}\n"
                 f"Общая цена: {total_item_price}\n"
-                f"Изображение: {image_url}\n\n"
             )
 
             total_price += total_item_price
