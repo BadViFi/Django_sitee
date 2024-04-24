@@ -12,5 +12,118 @@
           <h3>А Зум вже не запустився</h3>
           <p>Бонуса немає </p>
           <p>Що робити?</p>
+                  </div>
+
+
+        <div class="mt-4 ">
+          <h3>Товари</h3>
+          <div class="owl-carousel owl-theme" id="products-carousel"></div>
+          <!-- <div class="owl-carousel owl-theme">
+            <div class="item card">
+              <a href="#" class="text-decoration-none text-white">
+                <img src="https://via.placeholder.com/600x400" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Card title</h5>
+                  <p class="card-text">100 грн</p>
+                </div>
+              </a>
+            </div>
+          </div> -->
+        </div>
+        <style>
+          .owl-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+          }
+          .owl-nav button {
+            background: #000;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+          }
+          .owl-nav button span {
+            font-size: 15px;
+            color: #fff;
+            background: #000;
+            padding: 10px 15px;
+            border-radius: 50%;
+            margin: 0 10px;
+          }
+          .owl-nav button span:hover {
+            background: #fff;
+            color: #000;
+          }
+          .owl-nav .owl-dots button {
+            background: #000;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+          }
+
+        </style>
+{% endblock %}
+
+{% block js %}
+<script>
+  $(document).ready(function() {
+      // Виконання запиту до API
+      $.ajax({
+          url: 'http://127.0.0.1:8000/api/v1/products/?format=json',
+          type: 'GET',
+          success: function(data) {
+              // Обробка отриманих даних
+              var products = data; // Припускаю, що отримані дані містять список товарів у полі "results"
+              console.log('products:', products);
+              var carousel = $('#products-carousel');
+
+              // Додавання карточок товарів до каруселі
+              $.each(products, function(index, product) {
+                  let main_imgae = product.images[0];
+                  if (main_imgae == undefined) {
+                      main_imgae = { image: 'https://via.placeholder.com/600x400' };
+                  }
+                  console.log('main_imgae:', main_imgae);
+                  let fulllink = `/catalog/${product.category[0].slug}/${product.slug}/`;
+
+                  var item = $('<div class="item card">');
+                  var link = $(`<a href="${fulllink}" class="text-decoration-none text-white">`);
+                  var img = $(`<img src="${main_imgae.image}" class="card-img-top" alt="${product.name}" style="height: 200px;">`);
+                  var cardBody = $('<div class="card-body">');
+                  var title = $('<h5 class="card-title">' + product.name + '</h5>');
+                  var price = $('<p class="card-text">' + product.price + '</p>');
+
+                  link.append(img);
+                  cardBody.append(title);
+                  cardBody.append(price);
+                  link.append(cardBody);
+                  item.append(link);
+
+                  carousel.append(item);
+              });
+
+              // Ініціалізація каруселі
+              carousel.owlCarousel({
+                  loop: false,
+                  margin: 10,
+                  nav: true,
+                  responsive: {
+                      0: { items: 1 },
+                      600: { items: 3 },
+                      1000: { items: 5 }
+                  }
+              });
+          },
+          error: function(error) {
+              console.log('Помилка при отриманні даних з API:', error);
+          }
+      });
+  });
+</script>
 
 {% endblock %}

@@ -14,7 +14,8 @@ import json
 import threading
 
 
-import aiohttp
+
+from pathlib import Path
 from aiogram.types import InputFile
 from decimal import Decimal
 from apps.order.models import Cart
@@ -271,9 +272,10 @@ def fetch_cart_info(data_us):
         user_cart = Cart.objects.filter(user__username=data_us)
 
         if not user_cart:
-            return ["Ваша корзина пуста."]
+            return {"cart_info": ["Ваша корзина пуста."], "image_urls": []}
 
         cart_info = []
+        image_urls = []
         total_price = 0
 
         for index, cart_item in enumerate(user_cart, start=1):
@@ -282,21 +284,39 @@ def fetch_cart_info(data_us):
             price = product.price
             total_item_price = quantity * price
 
+            # Извлекаем основное изображение товара из связанной модели Image
+            main_image = product.main_image()
+
+            if main_image:
+                # Получаем URL основного изображения товара
+                image_url = main_image.image.url
+                image_urls.append(image_url)
+            else:
+                # Если у товара нет изображения, ставим заглушку или пустую строку
+                image_url = ""
+
             cart_info.append(
                 f"{index}. {product.name}\n"
                 f"Количество: {quantity}\n"
                 f"Цена за единицу: {price}\n"
                 f"Общая цена: {total_item_price}\n"
+                # f"Изображение: {image_url}\n\n"
             )
 
             total_price += total_item_price
 
         cart_info.append(f"Всего: {total_price}\nС учетом скидки в 5%: {total_price * Decimal('0.95')}")
-        return cart_info
+
+        context = {
+            "cart_info": cart_info,
+            "image_urls": image_urls
+        }
+        return context
 
     except Exception as e:
         print(f"Ошибка при получении информации о корзине: {e}")
-        return ["Произошла ошибка при получении информации о корзине."]
+        return {"cart_info": ["Произошла ошибка при получении информации о корзине."], "image_urls": []}
+
 
 
 
@@ -334,7 +354,10 @@ async def get_user_cart(message: types.Message, state: FSMContext):
         user = await check_user(message.from_user.username)
         data_us = user["database_username"]
         
-        cart_info_list = await sync_to_async(fetch_cart_info)(data_us)
+        cart_info_listt = await sync_to_async(fetch_cart_info)(data_us)
+        cart_info_list = cart_info_listt["cart_info"]
+        image_urls = cart_info_listt["image_urls"]
+        
         if not cart_info_list:
             await message.answer("В вашей корзине ничего нет.")
             return
@@ -344,9 +367,12 @@ async def get_user_cart(message: types.Message, state: FSMContext):
 
         current_cart_index = 0
         current_cart_info = cart_info_list[current_cart_index]
+        current_cart_photo = image_urls[current_cart_index]
 
         markup = gen_button_cart_list(current_cart_index, current_cart_info)
-        await message.answer(current_cart_info, reply_markup=markup.as_markup())
+        photo_path = Path(current_cart_photo.lstrip('/'))
+        photo = types.FSInputFile(str(photo_path))
+        await message.answer_photo(photo, caption=current_cart_info, reply_markup=markup.as_markup())
 
         await state.update_data(cart_info_list=cart_info_list, current_cart_index=current_cart_index)
 
@@ -366,25 +392,40 @@ async def next_cart(call: types.CallbackQuery, state: FSMContext):
     call.message.delete_reply_markup()
     user = await check_user(call.from_user.username)
     data_us = user["database_username"]
-    cart_info_list = await sync_to_async(fetch_cart_info)(data_us)
-    
+    cart_info_listt = await sync_to_async(fetch_cart_info)(data_us)
+    cart_info_list = cart_info_listt["cart_info"]
     num_cart = int(call.data.split("_")[-1])
-    try:
-        cart_info = cart_info_list[num_cart]
-    except IndexError:
-        call.message.answer("Такого товару не існує")
+    
+    if num_cart < len(cart_info_list) - 1:
+        image_urls = cart_info_listt["image_urls"]
+        photo = image_urls[num_cart]
         try:
-            await call.message.delete()
-        except:
-            pass
+            cart_info = cart_info_list[num_cart]
+        except IndexError:
+            call.message.answer("Такого товару не існує")
+            try:
+                await call.message.delete()
+            except:
+                pass
 
-    markup = gen_button_cart_list(num_cart, cart_info_list)
-    await call.message.answer(cart_info, reply_markup=markup.as_markup())
+        markup = gen_button_cart_list(num_cart, cart_info_list)
+        photo_path = Path(photo.lstrip('/'))
+        print(photo_path)
+        photo = types.FSInputFile(str(photo_path))
+        print(photo)
+        await call.message.answer_photo(photo, caption=cart_info, reply_markup=markup.as_markup())
+    else:
+        # Если это последняя карточка, показываем только текст о сумме заказа
+        cart_info = cart_info_list[-1]  # Получаем информацию о сумме заказа
+        markup = gen_button_cart_list(num_cart, cart_info_list)  # Определяем markup для последней карточки
+        await call.message.answer(cart_info, reply_markup=markup.as_markup())
 
     try:
         await call.message.delete()
     except:
         pass
+
+
 
 
 

@@ -28,10 +28,12 @@ from rest_framework import routers
 
 from apps.api.views import ProfileViewSet
 from apps.api.blog.views import PostViewSet
+from apps.api.catalog.views import ProductViewSet
 
 routers = routers.DefaultRouter()
 routers.register(r'profiles', ProfileViewSet)
 routers.register(r'posts', PostViewSet)
+routers.register(r'products', ProductViewSet)
 
 
 urlpatterns = [

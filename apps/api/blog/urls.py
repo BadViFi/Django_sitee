@@ -4,5 +4,5 @@ from .views import PostViewSet
 
 
 urlpatterns = [
-    path('/', PostViewSet.as_view({'get': 'list'})),
+    path('', PostViewSet.as_view({'get': 'list'})),
 ]
