@@ -36,6 +36,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'catalog:index' %}"> <i class="fas fa-list"></i>Категорії</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chat:home' %}"> <i class="fas fa-comments"></i>Наш чат</a>
+                    </li>
                 </ul>
                 <form class="d-flex" role="search" method="get" action="{% url 'blog:index' %}">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">

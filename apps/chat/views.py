@@ -1,19 +1,31 @@
 from django.shortcuts import render, redirect
 from apps.chat.models import Room, Message
 from django.http import HttpResponse, JsonResponse
+from apps.members.models import Profile
+from django.contrib.auth.models import User
 
 # Create your views here.
 def home(request):
-    return render(request, 'home.html')
+    recent_chat_rooms = Room.objects.order_by('-id')[:10]  
+    return render(request, 'home.html', {'recent_chat_rooms': recent_chat_rooms})
 
 def room(request, room):
-    username = request.GET.get('username')
+    if request.user.is_authenticated:
+        username = request.user.username
+        profile = Profile.objects.get(user=request.user)
+        avatar_url = profile.get_avatar()  # Получаем URL аватара пользователя
+    else:
+        username = 'Anonymous'
+        avatar_url = '/media/avatars/default.png'  # Укажите путь к изображению по умолчанию
+
     room_details = Room.objects.get(name=room)
     return render(request, 'room.html', {
         'username': username,
         'room': room,
-        'room_details': room_details
+        'room_details': room_details,
+        'avatar_url': avatar_url,
     })
+
 
 def checkview(request):
     room = request.POST['room_name']
@@ -38,4 +50,28 @@ def send(request):
 def getMessages(request, room):
     room_details = Room.objects.get(name=room)
     messages = Message.objects.filter(room=room_details.id)
-    return JsonResponse({"messages":list(messages.values())})
+    serialized_messages = []
+    for message in messages:
+        try:
+            user = User.objects.get(username=message.user)
+            profile = Profile.objects.get(user=user)
+            avatar_url = profile.get_avatar()
+        except (User.DoesNotExist, Profile.DoesNotExist):
+            avatar_url = '/media/avatars/default.png'
+        
+        serialized_message = {
+            'id': message.id,
+            'value': message.value,
+            'user': message.user,
+            'date': message.date,
+            'avatar_url': avatar_url
+        }
+        serialized_messages.append(serialized_message)
+    return JsonResponse({"messages": serialized_messages})
+
+
+
+
+
+
+
