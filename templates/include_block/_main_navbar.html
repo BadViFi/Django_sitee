@@ -1,60 +1,79 @@
-<a class="btn btn-outline-primary btn-sm" href="{% url 'admin:index' %}">Admin</a>
-<nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
-    <div class="container">
-      <a class="navbar-brand" href="{% url 'main:index' %}"><img src="https://www.svgrepo.com/show/349342/docker.svg"  width="40" height="40">SigmaPythonHUB</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+{% load static %}
 
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'main:ja sigma' %}">About Us</a>
-          </li>
+<!DOCTYPE html>
+<html lang="en">
+  <a class="btn btn-outline-primary btn-sm" href="{% url 'admin:index' %}">Admin</a>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - OlegSigmaHUB</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link href="{% static 'styles.css' %}" rel="stylesheet">
+</head>
+<body> 
+    <!-- Навигационное меню -->
+    <nav class="navbar navbar-expand-lg bg-my-custom-color sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'main:index' %}"><img src="https://www.svgrepo.com/show/349342/docker.svg" width="40" height="40" alt="logo">OlegSigmaHUB</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'main:ja sigma' %}"><i class="fas fa-info-circle"></i>About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'main:ja sigmach' %}"><i class="fas fa-address-book"></i>Contacts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'blog:index' %}"><i class="fas fa-newspaper"></i>Article</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'catalog:index' %}"> <i class="fas fa-list"></i>Категорії</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chat:home' %}"> <i class="fas fa-comments"></i>Наш чат</a>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search" method="get" action="{% url 'blog:index' %}">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
+                    <button class="btn btn-success" type="submit">Search</button>
+                </form>
+                <div class="d-flex gap-2 ms-3">
+                    {% if user.is_authenticated %}
+                    <!-- Карзина -->
+                    <a class="btn btn-outline-primary btn-sm" href="{% url 'order:cart' %}?nocache=true">
+                        <i class="fa-solid fa-shopping-cart"></i>
+                        {% if request.user.is_authenticated %}
 
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'main:ja sigmach' %}">Contacts</a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'blog:index' %}">Article</a> 
-            
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'catalog:index' %}">Категорії</a>
-          </li>
-
-
-
-
-        </ul>
-        <form class="d-flex" role="search" method="get" action="{% url 'blog:index' %}">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
-          <button class="btn btn-success" type="submit">Search</button>
-        </form>
-        <div class="d-flex gap-2 ms-3">
-          {% if user.is_authenticated %}
-          <!-- Карзина -->
-          <a class="btn btn-outline-primary btn-sm" href="{% url 'order:cart' %}"><i class="fa-solid fa-shopping-cart"></i>
-            {% if request.user.is_authenticated %}
-            {{ request.user.cart_set.all|length }}
-        {% endif %}
-        </a>
-          <div class="dropdown text-end">
-            <a href="" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="{{user.profile.get_avatar}}" alt="mdo" width="32" height="32" class="rounded-circle">
-            </a>
-            <ul class="dropdown-menu text-small" style="">
-              <li><a class="dropdown-item" href="{% url 'members:profile' user.username %}"><i class="fa-solid fa-user"></i>Профіль</a></li>
-              <li><a class="dropdown-item" href="{% url 'members:search_profile' %}"><i class="fa-solid fa-user-magnifying-glass"></i>Пошук користувачів</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="{% url 'members:logout' %}"><i class="fa-solid fa-right-from-bracket"></i>Sign out</a></li>
-            </ul>
-          </div>
-            {% else %}
-            <a class="btn btn-outline-primary btn-sm" href="{% url 'members:login' %}"><i class="fa-solid fa-right-to-bracket"></i>Увійти</a>
-            <a class="btn btn-outline-warning btn-sm" href="{% url 'members:signup' %}"><i class="fa-solid fa-user-plus"></i>Зареєструватися</a>
-          {% endif %}
-      </div>
-    </div>
-  </nav>
+                        {% endif %}
+                    </a>
+                    <div class="dropdown text-end">
+                        <a href="" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{user.profile.get_avatar}}" alt="mdo" width="32" height="32" class="rounded-circle">
+                        </a>
+                        <ul class="dropdown-menu text-small" style="">
+                            <li><a class="dropdown-item" href="{% url 'members:profile' user.username %}"><i class="fa-solid fa-user"></i>Профіль</a></li>
+                            <li><a class="dropdown-item" href="{% url 'members:search_profile' %}"><i class="fas fa-search"></i>Пошук користувачів</a></li>
+                            <li><a class="dropdown-item" href="https://t.me/Django_web_bot"><i class="fab fa-telegram"></i>Наш бот</a></li>
+                            <li><a class="dropdown-item" href="https://t.me/pol_6it"><i class="fab fa-telegram"></i>Я в телеграмі</a></li>
+                            <li><a class="dropdown-item" href="https://github.com/BadViFi"><i class="fab fa-github"></i>Мій GitHub</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'members:logout' %}"><i class="fa-solid fa-right-from-bracket"></i>Sign out</a></li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <a class="btn btn-outline-primary btn-sm" href="{% url 'members:login' %}"><i class="fa-solid fa-right-to-bracket"></i>Увійти</a>
+                    <a class="btn btn-outline-warning btn-sm" href="{% url 'members:signup' %}"><i class="fa-solid fa-user-plus"></i>Зареєструватися</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+</body>
+</html>

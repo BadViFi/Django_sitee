@@ -1,63 +1,158 @@
+
 {% extends 'base.html' %}
 
 {% block title %}Каталог{% endblock %}
 
-
-
 {% block content %}
     
 
-        <div class="mt-3 rounded-3 bg-body-tertiary p-4">
-            <center><h3>Товарів - {{count_product}}</h3></center>
-                <div class='row mt-4'>
-                    {% for categor in categories %}
-                        <div class='col-3 col-sm-3 col-md-1'>
-                            <a href='{{ categor.get_absolute_url }}'>
-                            <div class='card p-0'>
-                                {% if categor.image %}
-                                    <img src='{{ categor.image.url }}' class='card-img-top' alt='{{ product.name }}'>
-                                {% else %}
-                                    <img src='https://via.placeholder.com/300x200' class='card-img-top' alt='{{ product.name }}'>
-                                {% endif %}
-                                
-                                    <p style='font-size: 10px;' class='text-center'>{{ categor.name }}</p>
-                               
-                            </div>
-                            </a>
-                        </div>
-                    {% endfor %}
+<div class="mt-3 rounded-3 bg-body-tertiary p-4">
+    <center><h3>Товарів - {{ count_product }}</h3></center>
+    <div class='row mt-4'>
+        {% for categor in categories %}
+        <div class='col-3 col-sm-3 col-md-1'>
+            <a href='{{ categor.get_absolute_url }}' class='card-link'> 
+                <div class='card'>
+                    {% if categor.image %}
+                    <img src='{{ categor.image.url }}' class='card-img-top' alt='{{ product.name }}'>
+                    {% else %}
+                    <img src='https://via.placeholder.com/300x200' class='card-img-top' alt='{{ product.name }}'>
+                    {% endif %}
+                    <p style='font-size: 10px;' class='text-center'>{{ categor.name }}</p>
                 </div>
-                <form method="get" class="form-inline mt-3">
-                    <div class="form-group mb-2">
-                        {{ object_list.form.as_p}}
-                    </div>
-                    <button type="submit" class="btn btn-primary mb-2">Сортировать</button>
-                </form>
-            {% if object_list.qs  %}
-            
-                <div class='row mt-4'>
-                    {% for product in object_list.qs %}
-                        <div class='col-4'>
-                            <div class='card'>
-                                {% if product.main_image %}
-                                    <img src='{{ product.main_image.image_thumbnail.url }}' class='card-img-top' alt='{{ product.name }}'>
-                                {% else %}
-                                    <img src='https://via.placeholder.com/300x200' class='card-img-top' alt='{{ product.name }}'>
-                                {% endif %}
-                                <div class='card-body'>
-                                    <h5 class='card-title'>{{ product.name }}</h5>
-                                    <!-- Ціна -->
-                                    <p class='card-text'>Цена: {{ product.price }} грн.</p>
-                                </div>
-                                <div class='card-footer'>
-                                    <a href='{{ product.get_absolute_url }}' class='btn btn-primary'>Подробнее</a>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>Товаров нет</p>
-            {% endif %}
+            </a>
         </div>
+        {% endfor %}
+    </div>
+    <form method="get" class="form-inline mt-3">
+        <div class="form-group mb-2">
+            {{ object_list.form.as_p}}
+        </div>
+        <button type="submit" class="btn btn-primary mb-2">Сортировать</button>
+    </form>
+    {% if object_list.qs  %}
+    <div class='row mt-4'>
+        {% for product in object_list.qs %}
+        <div class='col-4'>
+            <a href='{{ product.get_absolute_url }}' class='card-link'> 
+                <div class='card card-hover'> 
+                    {% if product.main_image %}
+                    <img src='{{ product.main_image.image_thumbnail.url }}' class='card-img-top' alt='{{ product.name }}'>
+                    {% else %}
+                    <img src='https://via.placeholder.com/300x200' class='card-img-top' alt='{{ product.name }}'>
+                    {% endif %}
+                    <div class='card-body'>
+                        <h5 class='card-title'>{{ product.name }}</h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class='card-text'>Цена: {{ product.price }} грн.</h5>
+                            <h6 class="card-text">
+                                {% if product.quantity %}  
+                                    {% if product.quantity >= 5 %}
+                                        <span class="text-success"> В наявності</span>
+                                    {% else %}
+                                        <span class="text-danger"> Закінчується</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-danger"> Немає в наявності</span>
+                                {% endif %}
+                            </h6>
+                            <form action="{% url 'order:add_to_cart' %}" method="get">
+                                <input type="hidden" name="product" value="{{ product.id }}">
+                                <input type="hidden" name="quantity" value="1"> 
+                                <button type="submit" class="btn btn-success btn-lg cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>Товаров нет</p>
+    {% endif %}
+</div>
+
+<style>
+    .card {
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card-hover:hover {
+        transform: rotate(3deg) scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+        padding: 1rem;  /* Добавим отступ для карточки */
+    }
+
+    .card-link {
+        color: inherit;  /* Убираем стиль ссылки, чтобы карточка выглядела как ссылка */
+        text-decoration: none;
+    }
+    
+    /* Стили для анимации кнопки корзины */
+    .cart-btn {
+        transition: transform 0.3s;
+    }
+    
+    .cart-btn:hover {
+        transform: scale(1.1);
+    }
+</style>
+
+<style>
+    /* Стили для кнопки корзины */
+    .cart-btn {
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .cart-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        animation: shake 0.5s infinite; /* Анимация вибрации */
+    }
+
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        10%, 30%, 50%, 70%, 90% {
+            transform: translateX(-5px); /* Движение влево */
+        }
+        20%, 40%, 60%, 80% {
+            transform: translateX(5px); /* Движение вправо */
+        }
+    }
+
+    .cart-btn:active {
+        transform: scale(1);
+        box-shadow: none;
+    }
+
+    .cart-icon {
+        position: absolute;
+        top: 50%;
+        right: 10px; /* Положение иконки справа */
+        transform: translate(0, -50%);
+    }
+
+    /* Мигание иконки */
+    @keyframes blink {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0;
+        }
+    }
+
+    .cart-btn:hover .cart-icon {
+        animation: blink 0.8s infinite; /* Анимация мигания */
+    }
+</style>
+
 {% endblock %}

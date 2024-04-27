@@ -28,10 +28,12 @@ from rest_framework import routers
 
 from apps.api.views import ProfileViewSet
 from apps.api.blog.views import PostViewSet
+from apps.api.catalog.views import ProductViewSet
 
 routers = routers.DefaultRouter()
 routers.register(r'profiles', ProfileViewSet)
 routers.register(r'posts', PostViewSet)
+routers.register(r'products', ProductViewSet)
 
 
 urlpatterns = [
@@ -46,4 +48,5 @@ urlpatterns = [
     path('blog/', include('apps.blog.urls')),
     path('catalog/', include('apps.catalog.urls')),
     path('order/', include('apps.order.urls')),
+    path('chat/',include('apps.chat.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="chat-header">
+        <h2>Welcome to Django Chat</h2>
+    </div>
+    <form id="post-form" method="POST" action="{% url 'chat:checkview' %}">  
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="room_name">Room Name:</label>
+            <input type="text" class="form-control" name="room_name" id="room_name">
+        </div>
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" class="form-control" name="username" id="username" {% if user.is_authenticated %}value="{{ user.username }}" readonly{% else %}value="Anonymous" readonly{% endif %}>
+        </div>
+        
+        <button type="submit" class="btn btn-success btn-block">Enter Room</button>
+    </form>
+</div>
+
+<div class="container-fluid">
+    <h4>Recent Chat Rooms</h4>
+    <ul class="list-group">
+        {% for room in recent_chat_rooms %}
+        <li class="list-group-item">{{ room.name }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
