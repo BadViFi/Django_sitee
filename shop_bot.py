@@ -112,7 +112,7 @@ async def login(message: types.Message, state: FSMContext):
     with open('users.json', 'w') as f:
         json.dump(users, f, indent=4)
 
-    await message.answer(f"ви успішно увійшли як {user.username}, натисніть /orders, щоб подивитися свої замовлення")
+    await message.answer(f"ви успішно увійшли як {user.username}, натисніть /orders, щоб подивитися свої замовлення, або /cart для того щоб подивитися вашу корзину")
     await state.clear()
 
 
