@@ -11,7 +11,7 @@
     <div class='row mt-4'>
         {% for categor in categories %}
         <div class='col-3 col-sm-3 col-md-1'>
-            <a href='{{ categor.get_absolute_url }}' class='card-link'> <!-- Обернуть карточку в <a> тег -->
+            <a href='{{ categor.get_absolute_url }}' class='card-link'> 
                 <div class='card'>
                     {% if categor.image %}
                     <img src='{{ categor.image.url }}' class='card-img-top' alt='{{ product.name }}'>
@@ -34,8 +34,8 @@
     <div class='row mt-4'>
         {% for product in object_list.qs %}
         <div class='col-4'>
-            <a href='{{ product.get_absolute_url }}' class='card-link'> <!-- Обернуть карточку в <a> тег -->
-                <div class='card card-hover'> <!-- Добавляем класс для эффекта поворота -->
+            <a href='{{ product.get_absolute_url }}' class='card-link'> 
+                <div class='card card-hover'> 
                     {% if product.main_image %}
                     <img src='{{ product.main_image.image_thumbnail.url }}' class='card-img-top' alt='{{ product.name }}'>
                     {% else %}
@@ -43,7 +43,6 @@
                     {% endif %}
                     <div class='card-body'>
                         <h5 class='card-title'>{{ product.name }}</h5>
-                        <!-- Ціна -->
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class='card-text'>Цена: {{ product.price }} грн.</h5>
                             <h6 class="card-text">
@@ -57,10 +56,9 @@
                                     <span class="text-danger"> Немає в наявності</span>
                                 {% endif %}
                             </h6>
-                            <!-- Кнопка "Добавить в корзину" -->
                             <form action="{% url 'order:add_to_cart' %}" method="get">
                                 <input type="hidden" name="product" value="{{ product.id }}">
-                                <input type="hidden" name="quantity" value="1"> <!-- Добавляем 1 товар по умолчанию -->
+                                <input type="hidden" name="quantity" value="1"> 
                                 <button type="submit" class="btn btn-success btn-lg cart-btn"><i class="fas fa-shopping-cart"></i></button>
                             </form>
                         </div>
@@ -75,7 +73,6 @@
     {% endif %}
 </div>
 
-<!-- CSS для эффекта поворота и увеличения -->
 <style>
     .card {
         transition: transform 0.3s, box-shadow 0.3s;

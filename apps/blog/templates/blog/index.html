@@ -11,7 +11,6 @@
 
             <h3>Блог</h3>
             
-            <!-- Button trigger modal -->
 
             {% if user.is_authenticated %}
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -123,28 +122,24 @@
           var image = document.getElementById('cropperImage');
           image.src = reader.result;
           
-          // Після того як зображення завантажиться, створіть екземпляр Cropper
           image.onload = function() {
               cropper = new Cropper(image, {
                   aspectRatio: 16 / 9,
                   viewMode: 1,
                 cropBoxMovable: true,
                 cropBoxResizable: true,
-                // Встановлюємо інші опції в false
                 movable: false,
                 zoomable: false,
                 rotatable: false,
                 scalable: false,
                 autoCrop: true,
                   crop: function(event) {
-                      // Поточна область обрізки доступна в event.detail
                       
                   }
               });
           };
       };
   
-      // Зчитування вибраного файлу як URL-адреси даних
       reader.readAsDataURL(input.files[0]);
   });
   
@@ -163,7 +158,6 @@
                       'X-CSRFToken': '{{ csrf_token }}'
                   }
               }).then(response => {
-                  // перезавантажити сторінку після успішної відправки форми
                   if (response.ok) {
                       location.reload();
                   }

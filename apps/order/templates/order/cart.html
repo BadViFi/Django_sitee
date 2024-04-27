@@ -25,7 +25,7 @@
                  <td><a href="{{item.product.get_absolute_url}}">{{ item.product.name }}</a></td>
                  <td><img src='{{ item.product.main_image.image_thumbnail.url }}' alt='{{ item.product.name }}' style="max-width: 100px; max-height: 100px;"></td>
                  <td>{{ item.product.price }}</td>
-                 <td class="align-middle"> <!-- Устанавливаем вертикальное выравнивание посередине -->
+                 <td class="align-middle">
                     <form method="post" class="mx-2" action="{% url 'order:cart_item_update' cart_id=item.id  action='update' %}">
                       {% csrf_token %}
                       <input type="number" name="quantity" value="{{ item.quantity }}" class="form-control" style="width: 100px;" onchange="this.form.submit()">

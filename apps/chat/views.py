@@ -13,10 +13,10 @@ def room(request, room):
     if request.user.is_authenticated:
         username = request.user.username
         profile = Profile.objects.get(user=request.user)
-        avatar_url = profile.get_avatar()  # Получаем URL аватара пользователя
+        avatar_url = profile.get_avatar()
     else:
         username = 'Anonymous'
-        avatar_url = '/media/avatars/default.png'  # Укажите путь к изображению по умолчанию
+        avatar_url = '/media/avatars/default.png' 
 
     room_details = Room.objects.get(name=room)
     return render(request, 'room.html', {

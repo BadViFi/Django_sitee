@@ -72,58 +72,67 @@
 {% block js %}
 <script>
   $(document).ready(function() {
-      // Виконання запиту до API
-      $.ajax({
-          url: 'http://127.0.0.1:8000/api/v1/products/?format=json',
-          type: 'GET',
-          success: function(data) {
-              // Обробка отриманих даних
-              var products = data; // Припускаю, що отримані дані містять список товарів у полі "results"
-              console.log('products:', products);
-              var carousel = $('#products-carousel');
+    var apiUrl = ''; 
 
-              // Додавання карточок товарів до каруселі
-              $.each(products, function(index, product) {
-                  let main_imgae = product.images[0];
-                  if (main_imgae == undefined) {
-                      main_imgae = { image: 'https://via.placeholder.com/600x400' };
-                  }
-                  console.log('main_imgae:', main_imgae);
-                  let fulllink = `/catalog/${product.category[0].slug}/${product.slug}/`;
+    if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+        apiUrl = 'http://127.0.0.1:8000/api/v1/products/?format=json';
+    } else {
+        apiUrl = 'https://s12370ns-8000.euw.devtunnels.ms/api/v1/products/?format=json';
+    }
 
-                  var item = $('<div class="item card">');
-                  var link = $(`<a href="${fulllink}" class="text-decoration-none text-white">`);
-                  var img = $(`<img src="${main_imgae.image}" class="card-img-top" alt="${product.name}" style="height: 200px;">`);
-                  var cardBody = $('<div class="card-body">');
-                  var title = $('<h5 class="card-title">' + product.name + '</h5>');
-                  var price = $('<p class="card-text">' + product.price + '</p>');
 
-                  link.append(img);
-                  cardBody.append(title);
-                  cardBody.append(price);
-                  link.append(cardBody);
-                  item.append(link);
+    $.ajax({
+        url: apiUrl,
+        type: 'GET',
+        success: function(data) {
 
-                  carousel.append(item);
-              });
+            var products = data;
+            console.log('products:', products);
+            var carousel = $('#products-carousel');
 
-              // Ініціалізація каруселі
-              carousel.owlCarousel({
-                  loop: false,
-                  margin: 10,
-                  nav: true,
-                  responsive: {
-                      0: { items: 1 },
-                      600: { items: 3 },
-                      1000: { items: 5 }
-                  }
-              });
-          },
-          error: function(error) {
-              console.log('Помилка при отриманні даних з API:', error);
-          }
-      });
-  });
+
+            $.each(products, function(index, product) {
+                let main_image = product.images[0];
+                if (main_image == undefined) {
+                    main_image = { image: 'https://via.placeholder.com/600x400' };
+                }
+                console.log('main_image:', main_image);
+                let fulllink = `/catalog/${product.category[0].slug}/${product.slug}/`;
+
+                var item = $('<div class="item card">');
+                var link = $('<a href="' + fulllink + '" class="text-decoration-none text-white">');
+                var img = $('<img src="' + main_image.image + '" class="card-img-top" alt="' + product.name + '" style="height: 200px;">');
+                var cardBody = $('<div class="card-body">');
+                var title = $('<h5 class="card-title">' + product.name + '</h5>');
+                var price = $('<p class="card-text">' + product.price + '</p>');
+
+                link.append(img);
+                cardBody.append(title);
+                cardBody.append(price);
+                link.append(cardBody);
+                item.append(link);
+
+                carousel.append(item);
+            });
+
+
+            carousel.owlCarousel({
+                loop: false,
+                margin: 10,
+                nav: true,
+                responsive: {
+                    0: { items: 1 },
+                    600: { items: 3 },
+                    1000: { items: 5 }
+                }
+            });
+        },
+        error: function(error) {
+            console.log('Помилка при отриманні даних з API:', error);
+        }
+    });
+});
+
 </script>
 
 {% endblock %}

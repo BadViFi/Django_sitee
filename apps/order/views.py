@@ -24,10 +24,8 @@ def get_cart_data(user_id):
     cart = Cart.objects.filter(user=user_id).prefetch_related('product').prefetch_related('product__images')
     total_price = sum([item.total_price() for item in cart])
 
-    # Проверяем, есть ли скидка для текущего пользователя
     discounted = discount(username)
 
-    # Если скидка есть и у заказа не применялась, применяем ее к общей стоимости
     if discounted and not Order.objects.filter(user=user, discount_applied=False).exists():
         total_price = total_price * Decimal('0.95') 
 

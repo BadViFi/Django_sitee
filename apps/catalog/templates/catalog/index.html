@@ -14,7 +14,7 @@
     <div class='row mt-4'>
         {% for product in object_list %}
         <div class='col-4'>
-            <a href='{{ product.get_absolute_url }}' class='card-link'>  <!-- Обернуть карточку в <a> тег -->
+            <a href='{{ product.get_absolute_url }}' class='card-link'>  
                 <div class='card'>
                     {% if product.image %}
                     <img src='{{ product.image.url }}' class='card-img-top' alt='{{ product.name }}'>
@@ -34,7 +34,7 @@
     {% endif %}
 </div>
 
-<!-- CSS для эффекта поворота и увеличения -->
+
 <style>
     .card {
         transition: transform 0.3s, box-shadow 0.3s;
