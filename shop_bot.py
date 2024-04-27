@@ -46,7 +46,7 @@ class RegisterState(StatesGroup):
 
 @dp.message(Command("start"))
 async def username(message: types.Message, state: FSMContext):
-    await message.answer("це особистий кабінет для пайтон сайта, натисніть - /login щоб зареєструватися, /logout щоб вийти з аккаунту, /orders щоб подивитись свої замовлення")
+    await message.answer("це особистий кабінет для пайтон сайта, натисніть - /login щоб зареєструватися, /logout щоб вийти з аккаунту, /orders щоб подивитись свої замовлення, /cart щоб подивитися товари вкорзині")
 
 
 
@@ -184,7 +184,6 @@ mainmenu.row(types.InlineKeyboardButton(text="Ваші замовлення", ca
         
 def gen_button_orders_list(num_order, orders):
     markup = InlineKeyboardBuilder()
-    # Получаем количество заказов
     length_orders = len(orders)
     if num_order == 0:
         markup.row(
@@ -284,15 +283,12 @@ def fetch_cart_info(data_us):
             price = product.price
             total_item_price = quantity * price
 
-            # Извлекаем основное изображение товара из связанной модели Image
             main_image = product.main_image()
 
             if main_image:
-                # Получаем URL основного изображения товара
                 image_url = main_image.image.url
                 image_urls.append(image_url)
             else:
-                # Если у товара нет изображения, ставим заглушку или пустую строку
                 image_url = ""
 
             cart_info.append(
@@ -300,7 +296,6 @@ def fetch_cart_info(data_us):
                 f"Количество: {quantity}\n"
                 f"Цена за единицу: {price}\n"
                 f"Общая цена: {total_item_price}\n"
-                # f"Изображение: {image_url}\n\n"
             )
 
             total_price += total_item_price
@@ -415,9 +410,8 @@ async def next_cart(call: types.CallbackQuery, state: FSMContext):
         print(photo)
         await call.message.answer_photo(photo, caption=cart_info, reply_markup=markup.as_markup())
     else:
-        # Если это последняя карточка, показываем только текст о сумме заказа
-        cart_info = cart_info_list[-1]  # Получаем информацию о сумме заказа
-        markup = gen_button_cart_list(num_cart, cart_info_list)  # Определяем markup для последней карточки
+        cart_info = cart_info_list[-1]  
+        markup = gen_button_cart_list(num_cart, cart_info_list)
         await call.message.answer(cart_info, reply_markup=markup.as_markup())
 
     try:

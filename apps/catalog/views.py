@@ -14,7 +14,7 @@ from django.utils.decorators import method_decorator
 
 # Create your views here.
 
-
+@method_decorator(cache_page(60 * 2), name='dispatch')
 class CataloglistView(ListViewBreadcrumbMixin):
     model = Catalog
     template_name = 'catalog/index.html'
