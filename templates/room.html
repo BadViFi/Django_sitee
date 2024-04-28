@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
@@ -25,7 +24,11 @@
     <input type="text" name="message" id="message" placeholder="Type your message here" class="form-control" />
     <button type="submit" class="btn btn-success ml-2">Send</button>
 </form>
-</div>
+<form action="{% url 'chat:delete_messages' room %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Delete Messages">
+</form>
+
 
 <script>
 $(document).ready(function(){
@@ -77,6 +80,3 @@ $(document).ready(function(){
 </script>
 
 {% endblock %}
-
-</body>
-</html>
