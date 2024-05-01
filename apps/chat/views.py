@@ -3,7 +3,10 @@ from apps.chat.models import Room, Message
 from django.http import HttpResponse, JsonResponse
 from apps.members.models import Profile
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 # Create your views here.
 def home(request):
     recent_chat_rooms = Room.objects.order_by('-id')[:10]  
@@ -70,6 +73,25 @@ def getMessages(request, room):
     return JsonResponse({"messages": serialized_messages})
 
 
+@login_required
+def edit_message(request, message_id):
+    message = get_object_or_404(Message, id=message_id)
+    if message.user == request.user.username:
+        if request.method == 'POST':
+            new_message_value = request.POST['message']
+            message.value = new_message_value
+            message.save()
+            return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'You are not allowed to edit this message.'})
+
+@login_required
+def delete_message(request, message_id):
+    message = get_object_or_404(Message, id=message_id)
+    if message.user == request.user.username:
+        if request.method == 'POST':
+            message.delete()
+            return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'You are not allowed to delete this message.'})
 
 
 
